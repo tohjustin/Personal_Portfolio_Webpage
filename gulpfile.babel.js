@@ -23,7 +23,7 @@ const bases = {
 };
 
 const paths = {
-  app: 'src/js/src.js',
+  app: 'src/js/app.js',
   scripts: ['src/js/**/*.js', '!js/libs/**/*.js'],
   styles: ['src/styles/**/*.scss', 'src/styles/**/*.sass', 'src/styles/**/*.css'],
   html: ['src/**/*.html'],
