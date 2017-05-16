@@ -3,7 +3,8 @@
   "version": "2.0.0",
   "description": "Online portfolio site",
   "scripts": {
-    "dev": "gulp serve"
+    "dev": "gulp serve",
+    "build": "rm -rf ./dist && gulp build"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",

@@ -93,3 +93,4 @@ gulp.task('watch', () => {
 });
 
 gulp.task('serve', ['html', 'styles', 'scripts', 'imagemin', 'watch']);
+gulp.task('build', ['html', 'styles', 'scripts', 'imagemin']);
