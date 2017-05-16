@@ -17,6 +17,7 @@ import uglify from 'gulp-uglify';
 import sourcemaps from 'gulp-sourcemaps';
 
 const bases = {
+  index: './',
   app: 'src/',
   dist: 'dist/',
 };
@@ -29,13 +30,11 @@ const paths = {
   images: ['src/images/*'],
 };
 
-// Copy HTML file over to /dist
+// Github user pages requires index.html to be in master branch, root dir
 gulp.task('html', () => {
   gulp.src(paths.html)
-    .pipe(gulp.dest(bases.dist))
-    .pipe(browserSync.stream({
-      match: paths.dist,
-    }));
+    .pipe(gulp.dest(bases.index))
+    .pipe(browserSync.stream({ match: bases.index }));
 });
 
 // Process SCSS files and concatenate them into one output file
@@ -58,7 +57,6 @@ gulp.task('styles', () => {
 });
 
 gulp.task('scripts', () => {
-  // app.js is your main JS file with all your module inclusions
   browserify({ entries: paths.app, debug: true })
     .transform(babelify, { presets: ['es2015'], sourceMaps: true })
     .bundle()
@@ -70,21 +68,19 @@ gulp.task('scripts', () => {
     .pipe(gulp.dest(bases.dist));
 });
 
-// Imagemin images and ouput them in dist
+// Minify images, ouput them in dist
 gulp.task('imagemin', () => {
   gulp.src(paths.images)
     .pipe(imagemin())
     .pipe(gulp.dest(`${bases.dist}images/`))
-    .pipe(browserSync.stream({
-      match: paths.dist,
-    }));
+    .pipe(browserSync.stream({ match: bases.dist }));
 });
 
 gulp.task('watch', () => {
   browserSync.create();
   browserSync.init({
     injectChanges: true,
-    server: `./${bases.dist}`,
+    server: `${bases.index}`, // serve files from root dir
   });
   gulp.watch(paths.html, ['html']);
   gulp.watch(paths.styles, ['styles']);

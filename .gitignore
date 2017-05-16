@@ -1,6 +1,3 @@
-# Don't upload built files into repo
-dist/*
-
 # Logs
 logs
 *.log

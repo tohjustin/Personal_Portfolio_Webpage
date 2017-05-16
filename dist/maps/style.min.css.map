@@ -1,0 +1,1 @@
+{"version":3,"sources":["style.scss","style2.css"],"names":[],"mappings":"AAAA,KACE,MAAA,KACA,UAAA,KCFF,GACE,MAAA,QACA,UAAA","file":"../style.min.css","sourcesContent":["body {\n  color: blue;\n  font-size: 15px;\n}\n","h2 {\n  color: goldenrod;\n  font-size: 40px;\n}\n"]}
