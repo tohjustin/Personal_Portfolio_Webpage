@@ -1,8 +1,15 @@
 .icon {
   font-size: $icon-size;
 
-  .fa {
+  a {
+    color: inherit;
     margin-right: 1.5rem;
+    text-decoration: none;
+
+    &:hover {
+      color: $color-primary;
+      cursor: pointer;
+    }
 
     &:last-child {
       margin-right: 0;
