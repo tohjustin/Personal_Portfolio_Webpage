@@ -14,13 +14,17 @@
   background-color: $color-primary;
   color: $font-color-white;
 
+  &:focus {
+    outline: 0;
+  }
+
   &:hover {
     background-color: $color-primary-shade-1;
   }
-}
 
-.btn--primary:disabled,
-.btn--primary:disabled:hover {
-  background-color: $color-primary-shade-2;
-  cursor: default;
+  &:disabled,
+  &:disabled:hover {
+    background-color: $color-primary-shade-2;
+    cursor: default;
+  }
 }
