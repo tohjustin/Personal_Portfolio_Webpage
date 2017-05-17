@@ -4,6 +4,7 @@
 @import "variables";
 @import "avatar";
 @import "button";
+@import "card";
 @import "content";
 @import "icon";
 
@@ -17,5 +18,10 @@ body {
 }
 
 .body {
+  align-items: center;
+  background-color: $color-primary;
   color: $font-color-black;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
 }

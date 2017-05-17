@@ -4,10 +4,12 @@ $color-primary-shade-1: #0c80db;
 $color-primary-shade-2: rgba(3, 102, 214, 0.5);
 $color-secondary: #d8d8d8;
 $color-secondary-shade-1: #eee;
+$color-black: #4a4a4a;
+$color-white: #fff;
 
 // Typography
-$font-color-black: #4a4a4a;
-$font-color-white: #fff;
+$font-color-black: $color-black;
+$font-color-white: $color-white;
 $font-size-small: 0.75rem;
 $font-size-regular: 1rem;
 $font-size-large: 2rem;
@@ -24,6 +26,12 @@ $avatar-width: $avatar-size;
 // Button
 $button-width: $avatar-size;
 $button-border-radius: 1.5em;
+
+// Card
+$card-backgroundColor: $color-white;
+$card-boxShadow: 0 14px 28px 1px rgba(0, 0, 0, 0.5);
+$card-height: 400px;
+$card-width: 600px;
 
 // Icon
 $icon-size: 1.5rem;
