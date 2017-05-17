@@ -13,6 +13,11 @@ $color-font-white: #fff;
 $color-border: $color-secondary;
 $color-border-focus: $color-primary;
 
+// Avatar
+$avatar-size: 9rem;
+$avatar-height: $avatar-size;
+$avatar-width: $avatar-size;
+
 // Button
-$button-width: 9rem; // random value for now...
+$button-width: $avatar-size;
 $button-border-radius: 1.5em;
