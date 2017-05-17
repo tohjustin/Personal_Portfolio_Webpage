@@ -1,0 +1,17 @@
+.content {
+  &--title {
+    font-family: 'Roboto', sans-serif;
+    font-size: $font-size-large;
+    font-weight: bold;
+  }
+
+  &--description {
+    font-size: $font-size-small;
+    font-weight: normal;
+  }
+
+  &--body {
+    font-size: $font-size-regular;
+    font-weight: normal;
+  }
+}

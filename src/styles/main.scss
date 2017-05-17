@@ -4,12 +4,11 @@
 @import "variables";
 @import "avatar";
 @import "button";
+@import "content";
 
 html,
-body,
-input,
-button {
-  font-family: 'Roboto', sans-serif;
+body {
+  font-family: 'Nunito', sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   font-weight: normal;
