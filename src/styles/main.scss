@@ -5,6 +5,7 @@
 @import "avatar";
 @import "button";
 @import "content";
+@import "icon";
 
 html,
 body {
@@ -16,5 +17,5 @@ body {
 }
 
 .body {
-  color: $color-font-black;
+  color: $font-color-black;
 }
