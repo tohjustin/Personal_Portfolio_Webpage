@@ -1,2 +1,2 @@
-body{color:#00f;font-size:15px}h2{color:#daa520;font-size:40px}
+@import url(https://fonts.googleapis.com/css?family=Roboto);@import url(https://fonts.googleapis.com/css?family=Nunito);@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);body,button,html,input{font-family:Roboto,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;font-weight:400;margin:0}.body{color:#333}
 /*# sourceMappingURL=maps/style.min.css.map */
