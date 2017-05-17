@@ -1,3 +1,11 @@
 .icon {
   font-size: $icon-size;
+
+  .fa {
+    margin-right: 1.5rem;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
 }
