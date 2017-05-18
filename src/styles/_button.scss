@@ -21,10 +21,4 @@
   &:hover {
     background-color: $color-primary-shade-1;
   }
-
-  &:disabled,
-  &:disabled:hover {
-    background-color: $color-primary-shade-2;
-    cursor: default;
-  }
 }
