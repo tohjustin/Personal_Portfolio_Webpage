@@ -29,8 +29,10 @@ $button-border-radius: 1.5em;
 // Card
 $card-backgroundColor: $color-white;
 $card-boxShadow: 0 14px 28px 5px rgba(0, 0, 0, 0.5);
-$card-height: 20rem;
-$card-width: 36rem;
+$card-maxWidth: 38rem;
+$card-maxWidth-mobile: 19rem;
+$card-minWidth-mobile: 19rem;
+$card-content-minHeight-mobile: 10rem;
 
 // Icon
 $icon-size: 1.5rem;

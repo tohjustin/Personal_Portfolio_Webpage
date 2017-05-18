@@ -16,7 +16,8 @@
     }
   }
 
-  .fa-github-square {
+  .fa-github-square,
+  .fa-behance-square {
     font-size: calc(#{$icon-size} * 1.1); // tweaked the icon size
   }
 }

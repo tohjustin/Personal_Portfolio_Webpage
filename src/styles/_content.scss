@@ -1,4 +1,8 @@
 .content {
+  > div {
+    margin: 0.5rem;
+  }
+
   &--title {
     font-family: 'Roboto', sans-serif;
     font-size: $font-size-large;
