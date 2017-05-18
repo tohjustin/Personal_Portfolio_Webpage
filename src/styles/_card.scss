@@ -12,6 +12,21 @@
   padding: 1.5rem;
   width: 80%;
 
+  &--animation {
+    -webkit-transition:
+      max-height 250ms ease-in-out,
+      max-width 375ms ease-in-out;
+    -moz-transition:
+      max-height 250ms ease-in-out,
+      max-width 375ms ease-in-out;
+    -o-transition:
+      max-height 250ms ease-in-out,
+      max-width 375ms ease-in-out;
+    transition:
+      max-height 250ms ease-in-out,
+      max-width 375ms ease-in-out;
+  }
+
   &--bottomPanel {
     align-items: center;
     display: flex;
