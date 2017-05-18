@@ -3,11 +3,14 @@
   border-radius: 4px;
   box-shadow: $card-boxShadow;
   display: flex;
-  flex-direction: column;
-  height: calc(#{$card-height} - 2 * 1.5rem);
+  flex-direction: row;
+  flex-wrap: wrap;
+  height: 80%;
   justify-content: space-around;
-  padding: 1.5rem 2rem;
-  width: calc(#{$card-width} - 2 * 2rem);
+  max-height: $card-height;
+  max-width: $card-width;
+  padding: 1.5rem;
+  width: 80%;
 
   &--bottomPanel {
     align-items: center;
@@ -15,12 +18,14 @@
     flex-direction: row;
     height: 10%;
     justify-content: center;
+    // padding: 1rem 0;
     width: 100%;
   }
 
   &--topPanel {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     height: 80%;
     justify-content: space-around;
     width: 100%;
@@ -39,6 +44,33 @@
       flex-direction: column;
       justify-content: space-around;
       width: 55%;
+    }
+  }
+}
+
+@media screen and (max-width: 600px) and (min-width: 0) {
+  .card {
+    height: 100%;
+    justify-content: space-between;
+    max-height: 35rem;
+    max-width: 20rem;
+
+    &--topPanel {
+      height: 90%;
+
+      &__left {
+        width: 100%;
+      }
+
+      &__right {
+        align-items: center;
+        text-align: center;
+        width: 100%;
+      }
+    }
+
+    &--bottomPanel {
+      height: 10%;
     }
   }
 }
