@@ -28,6 +28,7 @@ const paths = {
   styles: ['src/styles/**/*.scss', 'src/styles/**/*.sass', 'src/styles/**/*.css'],
   html: ['src/**/*.html'],
   images: ['src/images/*'],
+  resume: ['resume/dist/*'],
 };
 
 // Github user pages requires index.html to be in master branch, root dir
@@ -68,11 +69,18 @@ gulp.task('scripts', () => {
     .pipe(gulp.dest(bases.dist));
 });
 
-// Minify images, ouput them in dist
+// Minify images, output them in dist
 gulp.task('imagemin', () => {
   gulp.src(paths.images)
     .pipe(imagemin())
     .pipe(gulp.dest(`${bases.dist}images/`))
+    .pipe(browserSync.stream({ match: bases.dist }));
+});
+
+// Copy generate resume in `/resume` into `/dist`
+gulp.task('updateResume', () => {
+  gulp.src(paths.resume)
+    .pipe(gulp.dest(`${bases.dist}`))
     .pipe(browserSync.stream({ match: bases.dist }));
 });
 
@@ -86,7 +94,8 @@ gulp.task('watch', () => {
   gulp.watch(paths.styles, ['styles']);
   gulp.watch(paths.scripts, ['lint', 'scripts']);
   gulp.watch(paths.images, ['imagemin']);
+  gulp.watch(paths.resume, ['updateResume']);
 });
 
-gulp.task('serve', ['html', 'styles', 'scripts', 'imagemin', 'watch']);
-gulp.task('build', ['html', 'styles', 'scripts', 'imagemin']);
+gulp.task('serve', ['html', 'styles', 'scripts', 'imagemin', 'updateResume', 'watch']);
+gulp.task('build', ['html', 'styles', 'scripts', 'imagemin', 'updateResume']);
