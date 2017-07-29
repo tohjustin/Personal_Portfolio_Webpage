@@ -16,6 +16,13 @@ import buffer from 'vinyl-buffer';
 import uglify from 'gulp-uglify';
 import sourcemaps from 'gulp-sourcemaps';
 
+// SKETCH FILES
+import shell from 'gulp-shell';
+
+// constants
+const EXPORT_RESUME_SCRIPT_PATH = 'sketch/exportResume.sh';
+const RESUME_SKETCH_FILE_PATH = 'sketch/resume.sketch';
+
 const bases = {
   index: './',
   app: 'src/',
@@ -28,7 +35,7 @@ const paths = {
   styles: ['src/styles/**/*.scss', 'src/styles/**/*.sass', 'src/styles/**/*.css'],
   html: ['src/**/*.html'],
   images: ['src/images/*'],
-  resume: ['resume/dist/*'],
+  resume: [RESUME_SKETCH_FILE_PATH],
 };
 
 // Github user pages requires index.html to be in master branch, root dir
@@ -77,10 +84,12 @@ gulp.task('imagemin', () => {
     .pipe(browserSync.stream({ match: bases.dist }));
 });
 
-// Copy generate resume in `/resume` into `/dist`
-gulp.task('updateResume', () => {
+// Run bash script to generate resume .pdf & .png files, output to `/dist`
+gulp.task('exportResume', () => {
   gulp.src(paths.resume)
-    .pipe(gulp.dest(`${bases.dist}`))
+    .pipe(shell([
+      `${EXPORT_RESUME_SCRIPT_PATH} <%= file.path %>`,
+    ]))
     .pipe(browserSync.stream({ match: bases.dist }));
 });
 
@@ -94,8 +103,8 @@ gulp.task('watch', () => {
   gulp.watch(paths.styles, ['styles']);
   gulp.watch(paths.scripts, ['lint', 'scripts']);
   gulp.watch(paths.images, ['imagemin']);
-  gulp.watch(paths.resume, ['updateResume']);
+  gulp.watch(paths.resume, ['exportResume']);
 });
 
-gulp.task('serve', ['html', 'styles', 'scripts', 'imagemin', 'updateResume', 'watch']);
-gulp.task('build', ['html', 'styles', 'scripts', 'imagemin', 'updateResume']);
+gulp.task('serve', ['html', 'styles', 'scripts', 'imagemin', 'exportResume', 'watch']);
+gulp.task('build', ['html', 'styles', 'scripts', 'imagemin', 'exportResume']);
