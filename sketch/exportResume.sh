@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-INPUT_SKETCH_FILE=resume.sketch
+INPUT_SKETCH_FILE=$1
 SKETCH_ARTBOARD_NAME=resume
 EXPORT_DIR=dist
 
-# Export Sketch artboard of resume into .pdf file
+# Export artboard into .pdf file
 sketchtool export artboards \
   --formats="pdf" \
   --items=$SKETCH_ARTBOARD_NAME \
@@ -13,7 +13,7 @@ sketchtool export artboards \
   --scales="1.0" \
   $INPUT_SKETCH_FILE
 
-# Export Sketch artboard of resume into .png files
+# Export artboard into .png files
 sketchtool export artboards \
   --formats="png" \
   --items=$SKETCH_ARTBOARD_NAME \
