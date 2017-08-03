@@ -1,28 +1,21 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto');
-@import url('https://fonts.googleapis.com/css?family=Nunito');
-@import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700');
 @import "variables";
-@import "avatar";
-@import "button";
-@import "card";
-@import "content";
-@import "icon";
 
 html,
 body {
-  font-family: 'Nunito', sans-serif;
-  font-size: 14px;
+  background-color: $color-primary;
+  font-family: 'Lato', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-weight: normal;
   margin: 0;
 }
 
-.body {
+div {
   align-items: center;
-  background-color: $color-primary;
-  color: $font-color-black;
+  color: $color-white;
   display: flex;
+  font-size: 40px;
+  font-weight: 700;
   height: 100vh;
   justify-content: center;
 }
