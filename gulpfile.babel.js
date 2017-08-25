@@ -101,7 +101,7 @@ gulp.task('watch', () => {
   });
   gulp.watch(paths.html, ['html']);
   gulp.watch(paths.styles, ['styles']);
-  gulp.watch(paths.scripts, ['lint', 'scripts']);
+  gulp.watch(paths.scripts, ['scripts']);
   gulp.watch(paths.images, ['imagemin']);
   gulp.watch(paths.resume, ['exportResume']);
 });
