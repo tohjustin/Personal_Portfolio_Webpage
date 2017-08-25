@@ -3,19 +3,42 @@
 
 html,
 body {
-  background-color: $color-primary;
+  background-color: $primary-color;
+  color: $black;
   font-family: 'Lato', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
 }
 
-div {
-  align-items: center;
-  color: $color-white;
+.content {
+  background-color: $white;
   display: flex;
-  font-size: 40px;
-  font-weight: 700;
+  flex-direction: column;
   height: 100vh;
   justify-content: center;
+  padding-left: $content-padding;
+  padding-right: $content-padding;
+  width: calc(50vw - 2 * #{$content-padding});
+
+  h1 {
+    font-size: 80px;
+    font-weight: 700;
+    text-align: left;
+  }
+
+  h2 {
+    font-size: 25px;
+    font-weight: 700;
+    margin-top: 10px;
+    text-align: left;
+  }
+
+  p {
+    font-size: 20px;
+    font-weight: normal;
+    line-height: 1.5;
+    margin-top: 40px;
+    text-align: left;
+  }
 }
