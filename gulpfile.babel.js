@@ -1,20 +1,21 @@
-import gulp from 'gulp';
 import browserSync from 'browser-sync';
+import gulp from 'gulp';
 
 // CSS
 import autoprefixer from 'gulp-autoprefixer';
-import minifycss from 'gulp-clean-css';
 import concat from 'gulp-concat';
 import imagemin from 'gulp-imagemin';
+import minifycss from 'gulp-clean-css';
 import sass from 'gulp-sass';
 
 // JAVASCRIPT
 import browserify from 'browserify';
 import babelify from 'babelify';
-import source from 'vinyl-source-stream';
 import buffer from 'vinyl-buffer';
-import uglify from 'gulp-uglify';
+import eslint from 'gulp-eslint';
+import source from 'vinyl-source-stream';
 import sourcemaps from 'gulp-sourcemaps';
+import uglify from 'gulp-uglify';
 
 // SKETCH FILES
 import shell from 'gulp-shell';
@@ -31,7 +32,7 @@ const bases = {
 
 const paths = {
   app: 'src/js/app.js',
-  scripts: ['src/js/**/*.js', '!js/libs/**/*.js'],
+  scripts: ['src/js/**/*.js', '!js/libs/**/*.js', '!node_modules/**'],
   styles: ['src/styles/**/*.scss', 'src/styles/**/*.sass', 'src/styles/**/*.css'],
   html: ['src/**/*.html'],
   images: ['src/images/*'],
@@ -53,9 +54,7 @@ gulp.task('styles', () => {
       outputStyle: 'compressed',
     }).on('error', sass.logError))
     .pipe(autoprefixer({
-      browsers: [
-        'last 2 versions',
-      ],
+      browsers: ['last 2 versions'],
     }))
     .pipe(concat('style.min.css'))
     .pipe(minifycss())
@@ -64,6 +63,14 @@ gulp.task('styles', () => {
     .pipe(browserSync.stream({ match: paths.dist }));
 });
 
+// Lint javascript code in '/src'
+gulp.task('lint', () => {
+  gulp.src(paths.scripts)
+    .pipe(eslint())
+    .pipe(eslint.format());
+});
+
+// Transpile javascript code in '/src'
 gulp.task('scripts', () => {
   browserify({ entries: paths.app, debug: true })
     .transform(babelify, { presets: ['es2015'], sourceMaps: true })
@@ -106,5 +113,5 @@ gulp.task('watch', () => {
   gulp.watch(paths.resume, ['exportResume']);
 });
 
-gulp.task('serve', ['html', 'styles', 'scripts', 'imagemin', 'exportResume', 'watch']);
-gulp.task('build', ['html', 'styles', 'scripts', 'imagemin', 'exportResume']);
+gulp.task('serve', ['html', 'styles', 'lint', 'scripts', 'imagemin', 'exportResume', 'watch']);
+gulp.task('build', ['html', 'styles', 'lint', 'scripts', 'imagemin', 'exportResume']);
