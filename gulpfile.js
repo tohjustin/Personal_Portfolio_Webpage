@@ -7,6 +7,7 @@ const autoprefixer = require('gulp-autoprefixer');
 const imagemin = require('gulp-imagemin');
 const minifycss = require('gulp-clean-css');
 const sass = require('gulp-sass');
+const stylelint = require('gulp-stylelint');
 
 // JAVASCRIPT
 const babelify = require('babelify');
@@ -42,6 +43,12 @@ gulp.task('html', () => {
   gulp.src(PATH.html)
     .pipe(gulp.dest(BASES.root))
     .pipe(browserSync.stream({ match: BASES.root }));
+});
+
+// Process SCSS files and concatenate them into one output file
+gulp.task('stylelint', () => {
+  gulp.src(PATH.styles)
+    .pipe(stylelint({ reporters: [{ formatter: 'string', console: true }] }));
 });
 
 // Process SCSS files and concatenate them into one output file
@@ -102,8 +109,8 @@ gulp.task('watch', () => {
   gulp.watch(PATH.resume, ['exportResume']);
   gulp.watch(PATH.images, ['imagemin']);
   gulp.watch(PATH.scripts, ['eslint', 'scripts']);
-  gulp.watch(PATH.styles, ['styles']);
+  gulp.watch(PATH.styles, ['stylelint', 'styles']);
 });
 
-gulp.task('build', ['html', 'styles', 'eslint', 'scripts', 'imagemin', 'exportResume']);
+gulp.task('build', ['html', 'stylelint', 'styles', 'eslint', 'scripts', 'imagemin', 'exportResume']);
 gulp.task('serve', ['build', 'watch']);
