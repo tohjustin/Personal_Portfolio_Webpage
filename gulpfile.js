@@ -1,24 +1,24 @@
-import browserSync from 'browser-sync';
-import gulp from 'gulp';
+const browserSync = require('browser-sync');
+const gulp = require('gulp');
 
 // CSS
-import autoprefixer from 'gulp-autoprefixer';
-import concat from 'gulp-concat';
-import imagemin from 'gulp-imagemin';
-import minifycss from 'gulp-clean-css';
-import sass from 'gulp-sass';
+const autoprefixer = require('gulp-autoprefixer');
+const concat = require('gulp-concat');
+const imagemin = require('gulp-imagemin');
+const minifycss = require('gulp-clean-css');
+const sass = require('gulp-sass');
 
 // JAVASCRIPT
-import browserify from 'browserify';
-import babelify from 'babelify';
-import buffer from 'vinyl-buffer';
-import eslint from 'gulp-eslint';
-import source from 'vinyl-source-stream';
-import sourcemaps from 'gulp-sourcemaps';
-import uglify from 'gulp-uglify';
+const browserify = require('browserify');
+const babelify = require('babelify');
+const buffer = require('vinyl-buffer');
+const eslint = require('gulp-eslint');
+const source = require('vinyl-source-stream');
+const sourcemaps = require('gulp-sourcemaps');
+const uglify = require('gulp-uglify');
 
 // SKETCH FILES
-import shell from 'gulp-shell';
+const shell = require('gulp-shell');
 
 // constants
 const EXPORT_RESUME_SCRIPT_PATH = 'sketch/exportResume.sh';
