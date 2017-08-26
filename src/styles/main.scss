@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Lato:400,700');
 @import "reset";
+@import "content";
 @import "variables";
 
 html,
@@ -9,46 +10,4 @@ body {
   font-family: 'Lato', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  margin: 0;
-}
-
-.content {
-  background-color: $white;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  justify-content: center;
-  padding-left: $content-padding;
-  padding-right: $content-padding;
-  width: calc(50vw - 2 * #{$content-padding});
-
-  h1 {
-    font-size: 80px;
-    font-weight: 700;
-    text-align: left;
-  }
-
-  h2 {
-    font-size: 25px;
-    font-weight: 700;
-    margin-top: 10px;
-    text-align: left;
-  }
-
-  .links {
-    margin-top: 20px;
-
-    a {
-      color: inherit;
-      margin-right: 15px;
-    }
-  }
-
-  p {
-    font-size: 20px;
-    font-weight: normal;
-    line-height: 1.5;
-    margin-top: 40px;
-    text-align: left;
-  }
 }
