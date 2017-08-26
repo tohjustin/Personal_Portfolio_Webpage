@@ -6,6 +6,9 @@
     "dev": "gulp serve",
     "build": "rm -rf ./dist && rm ./index.html && gulp build"
   },
+  "dependencies": {
+    "feather-icons": "^3.2.2"
+  },
   "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-eslint": "^7.1.1",
@@ -28,6 +31,7 @@
     "gulp-sass": "^3.1.0",
     "gulp-shell": "^0.6.3",
     "gulp-sourcemaps": "^2.4.1",
+    "gulp-stylelint": "^5.0.0",
     "gulp-uglify": "^2.0.0",
     "gulp-util": "^3.0.8",
     "node-sass": "^4.5.0",
@@ -39,8 +43,5 @@
   },
   "engine": "node >= 6.9.5",
   "author": "Justin Toh",
-  "license": "MIT",
-  "dependencies": {
-    "gulp-stylelint": "^3.9.0"
-  }
+  "license": "MIT"
 }
