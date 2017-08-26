@@ -6,9 +6,9 @@
   flex-direction: column;
   height: 100vh;
   justify-content: center;
+  max-width: 50vw;
   padding-left: $content-padding;
   padding-right: $content-padding;
-  width: calc(50vw - 2 * #{$content-padding});
 
   h1 {
     font-size: 80px;

@@ -1,0 +1,12 @@
+@import "variables";
+
+.garden {
+  background-color: $primary-color;
+  height: 100vh;
+  min-width: 50vw;
+  width: calc(100vw - 450px - 2 * #{$content-padding});
+
+  canvas {
+    position: absolute;
+  }
+}

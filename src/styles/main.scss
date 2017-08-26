@@ -1,12 +1,15 @@
 @import url('https://fonts.googleapis.com/css?family=Lato:400,700');
 @import "reset";
-@import "content";
 @import "variables";
+@import "content";
+@import "garden";
 
 html,
 body {
   background-color: $primary-color;
   color: $black;
+  display: flex;
+  flex-direction: row;
   font-family: 'Lato', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
