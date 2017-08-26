@@ -1,16 +1,16 @@
 const browserSync = require('browser-sync');
 const gulp = require('gulp');
+const rename = require('gulp-rename');
 
 // CSS
 const autoprefixer = require('gulp-autoprefixer');
-const concat = require('gulp-concat');
 const imagemin = require('gulp-imagemin');
 const minifycss = require('gulp-clean-css');
 const sass = require('gulp-sass');
 
 // JAVASCRIPT
-const browserify = require('browserify');
 const babelify = require('babelify');
+const browserify = require('browserify');
 const buffer = require('vinyl-buffer');
 const eslint = require('gulp-eslint');
 const source = require('vinyl-source-stream');
@@ -20,98 +20,90 @@ const uglify = require('gulp-uglify');
 // SKETCH FILES
 const shell = require('gulp-shell');
 
-// constants
-const EXPORT_RESUME_SCRIPT_PATH = 'sketch/exportResume.sh';
-const RESUME_SKETCH_FILE_PATH = 'sketch/resume.sketch';
-
-const bases = {
-  index: './',
+const BASES = {
   app: 'src/',
   dist: 'dist/',
+  images: 'dist/images/',
+  root: './',
 };
 
-const paths = {
+const PATH = {
   app: 'src/js/app.js',
-  scripts: ['src/js/**/*.js', '!js/libs/**/*.js', '!node_modules/**'],
-  styles: ['src/styles/**/*.scss', 'src/styles/**/*.sass', 'src/styles/**/*.css'],
+  exportResume: 'sketch/exportResume.sh',
   html: ['src/**/*.html'],
   images: ['src/images/*'],
-  resume: [RESUME_SKETCH_FILE_PATH],
+  resume: ['sketch/resume.sketch'],
+  scripts: ['src/js/**/*.js', '!js/libs/**/*.js', '!node_modules/**'],
+  styles: ['src/styles/**/*.scss', 'src/styles/**/*.sass', 'src/styles/**/*.css'],
 };
 
 // Github user pages requires index.html to be in master branch, root dir
 gulp.task('html', () => {
-  gulp.src(paths.html)
-    .pipe(gulp.dest(bases.index))
-    .pipe(browserSync.stream({ match: bases.index }));
+  gulp.src(PATH.html)
+    .pipe(gulp.dest(BASES.root))
+    .pipe(browserSync.stream({ match: BASES.root }));
 });
 
 // Process SCSS files and concatenate them into one output file
 gulp.task('styles', () => {
-  gulp.src(paths.styles)
+  gulp.src(PATH.styles)
     .pipe(sourcemaps.init())
-    .pipe(sass({
-      outputStyle: 'compressed',
-    }).on('error', sass.logError))
-    .pipe(autoprefixer({
-      browsers: ['last 2 versions'],
-    }))
-    .pipe(concat('style.min.css'))
+    .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
+    .pipe(autoprefixer({ browsers: ['last 2 versions'] }))
+    .pipe(rename({ basename: 'style', suffix: '.min' }))
     .pipe(minifycss())
-    .pipe(sourcemaps.write('./maps'))
-    .pipe(gulp.dest(bases.dist))
-    .pipe(browserSync.stream({ match: paths.dist }));
+    .pipe(sourcemaps.write('/maps'))
+    .pipe(gulp.dest(BASES.dist))
+    .pipe(browserSync.stream({ match: PATH.dist }));
 });
 
-// Lint javascript code in '/src'
-gulp.task('lint', () => {
-  gulp.src(paths.scripts)
+// Lint JS code with eslint
+gulp.task('eslint', () => {
+  gulp.src(PATH.scripts)
     .pipe(eslint())
     .pipe(eslint.format());
 });
 
-// Transpile javascript code in '/src'
+// Transpile JS code
 gulp.task('scripts', () => {
-  browserify({ entries: paths.app, debug: true })
+  browserify({ entries: PATH.app, debug: true })
     .transform(babelify, { presets: ['es2015'], sourceMaps: true })
     .bundle()
     .pipe(source('app.min.js'))
     .pipe(buffer())
     .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(uglify())
-    .pipe(sourcemaps.write('./maps'))
-    .pipe(gulp.dest(bases.dist));
+    .pipe(sourcemaps.write('/maps'))
+    .pipe(gulp.dest(BASES.dist));
 });
 
 // Minify images, output them in dist
 gulp.task('imagemin', () => {
-  gulp.src(paths.images)
+  gulp.src(PATH.images)
     .pipe(imagemin())
-    .pipe(gulp.dest(`${bases.dist}images/`))
-    .pipe(browserSync.stream({ match: bases.dist }));
+    .pipe(gulp.dest(BASES.images))
+    .pipe(browserSync.stream({ match: BASES.dist }));
 });
 
-// Run bash script to generate resume .pdf & .png files, output to `/dist`
+// Run bash script to generate resume .pdf & .png files
 gulp.task('exportResume', () => {
-  gulp.src(paths.resume)
-    .pipe(shell([
-      `${EXPORT_RESUME_SCRIPT_PATH} <%= file.path %>`,
-    ]))
-    .pipe(browserSync.stream({ match: bases.dist }));
+  gulp.src(PATH.resume)
+    .pipe(shell([`${PATH.exportResume} <%= file.path %>`]))
+    .pipe(browserSync.stream({ match: BASES.dist }));
 });
 
 gulp.task('watch', () => {
   browserSync.create();
   browserSync.init({
     injectChanges: true,
-    server: `${bases.index}`, // serve files from root dir
+    server: `${BASES.root}`,
   });
-  gulp.watch(paths.html, ['html']);
-  gulp.watch(paths.styles, ['styles']);
-  gulp.watch(paths.scripts, ['scripts']);
-  gulp.watch(paths.images, ['imagemin']);
-  gulp.watch(paths.resume, ['exportResume']);
+  gulp.watch(PATH.html, ['html']);
+  gulp.watch(PATH.resume, ['exportResume']);
+  gulp.watch(PATH.images, ['imagemin']);
+  gulp.watch(PATH.scripts, ['eslint', 'scripts']);
+  gulp.watch(PATH.styles, ['styles']);
 });
 
-gulp.task('serve', ['html', 'styles', 'lint', 'scripts', 'imagemin', 'exportResume', 'watch']);
-gulp.task('build', ['html', 'styles', 'lint', 'scripts', 'imagemin', 'exportResume']);
+gulp.task('build', ['html', 'styles', 'eslint', 'scripts', 'imagemin', 'exportResume']);
+gulp.task('serve', ['build', 'watch']);
