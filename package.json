@@ -5,7 +5,7 @@
   "scripts": {
     "build": "npm run clean && gulp build",
     "clean": "rimraf dist && rimraf index.html",
-    "start": "gulp serve"
+    "start": "npm run clean && gulp serve"
   },
   "dependencies": {
     "feather-icons": "^3.2.2"

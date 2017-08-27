@@ -1,21 +1,18 @@
-const browserSync = require('browser-sync');
-const gulp = require('gulp');
-const rename = require('gulp-rename');
-
-// CSS
 const autoprefixer = require('gulp-autoprefixer');
-const imagemin = require('gulp-imagemin');
-const minifycss = require('gulp-clean-css');
-const sass = require('gulp-sass');
-const stylelint = require('gulp-stylelint');
-
-// JAVASCRIPT
 const babelify = require('babelify');
 const browserify = require('browserify');
+const browserSync = require('browser-sync');
 const buffer = require('vinyl-buffer');
+const cleancss = require('gulp-clean-css');
 const eslint = require('gulp-eslint');
+const gulp = require('gulp');
+const imagemin = require('gulp-imagemin');
+const pump = require('pump');
+const rename = require('gulp-rename');
+const sass = require('gulp-sass');
 const source = require('vinyl-source-stream');
 const sourcemaps = require('gulp-sourcemaps');
+const stylelint = require('gulp-stylelint');
 const uglify = require('gulp-uglify');
 
 // SKETCH FILES
@@ -46,42 +43,51 @@ gulp.task('html', () => {
 });
 
 // Process SCSS files and concatenate them into one output file
-gulp.task('stylelint', () => {
-  gulp.src(PATH.styles)
-    .pipe(stylelint({ reporters: [{ formatter: 'string', console: true }] }));
+gulp.task('stylelint', (cb) => {
+  pump([
+    gulp.src(PATH.styles),
+    stylelint({ reporters: [{ formatter: 'string', console: true }] }),
+  ], cb);
 });
 
 // Process SCSS files and concatenate them into one output file
-gulp.task('styles', () => {
-  gulp.src(PATH.styles)
-    .pipe(sourcemaps.init())
-    .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
-    .pipe(autoprefixer({ browsers: ['last 2 versions'] }))
-    .pipe(rename({ basename: 'style', suffix: '.min' }))
-    .pipe(minifycss())
-    .pipe(sourcemaps.write('/maps'))
-    .pipe(gulp.dest(BASES.dist))
-    .pipe(browserSync.stream({ match: PATH.dist }));
+gulp.task('styles', ['stylelint'], (cb) => {
+  pump([
+    gulp.src(PATH.styles),
+    sourcemaps.init(),
+    sass().on('error', sass.logError),
+    autoprefixer({ browsers: ['last 2 versions'] }),
+    rename({ basename: 'style', suffix: '.min' }),
+    cleancss(),
+    sourcemaps.write('/maps'),
+    gulp.dest(BASES.dist),
+    browserSync.stream({ match: PATH.dist }),
+  ], cb);
 });
 
 // Lint JS code with eslint
-gulp.task('eslint', () => {
-  gulp.src(PATH.scripts)
-    .pipe(eslint())
-    .pipe(eslint.format());
+gulp.task('eslint', (cb) => {
+  pump([
+    gulp.src(PATH.scripts),
+    eslint(),
+    eslint.format(),
+    eslint.failAfterError(),
+  ], cb);
 });
 
 // Transpile JS code
-gulp.task('scripts', () => {
-  browserify({ entries: PATH.app, debug: true })
-    .transform(babelify, { presets: ['es2015'], sourceMaps: true })
-    .bundle()
-    .pipe(source('app.min.js'))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({ loadMaps: true }))
-    .pipe(uglify())
-    .pipe(sourcemaps.write('/maps'))
-    .pipe(gulp.dest(BASES.dist));
+gulp.task('scripts', ['eslint'], (cb) => {
+  pump([
+    browserify({ entries: PATH.app, debug: true })
+      .transform(babelify, { presets: ['es2015'], sourceMaps: true })
+      .bundle(),
+    source('app.min.js'),
+    buffer(),
+    sourcemaps.init({ loadMaps: true }),
+    uglify(),
+    sourcemaps.write('/maps'),
+    gulp.dest(BASES.dist),
+  ], cb);
 });
 
 // Minify images, output them in dist
@@ -108,9 +114,9 @@ gulp.task('watch', () => {
   gulp.watch(PATH.html, ['html']);
   gulp.watch(PATH.resume, ['exportResume']);
   gulp.watch(PATH.images, ['imagemin']);
-  gulp.watch(PATH.scripts, ['eslint', 'scripts']);
-  gulp.watch(PATH.styles, ['stylelint', 'styles']);
+  gulp.watch(PATH.scripts, ['scripts']);
+  gulp.watch(PATH.styles, ['styles']);
 });
 
-gulp.task('build', ['html', 'stylelint', 'styles', 'eslint', 'scripts', 'imagemin', 'exportResume']);
+gulp.task('build', ['html', 'styles', 'scripts', 'imagemin', 'exportResume']);
 gulp.task('serve', ['build', 'watch']);
