@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 function defined(a, b) {
   return a != null ? a : b;
 }
