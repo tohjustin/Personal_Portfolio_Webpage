@@ -87,6 +87,7 @@ gulp.task('scripts', ['eslint'], (cb) => {
     uglify(),
     sourcemaps.write('/maps'),
     gulp.dest(BASES.dist),
+    browserSync.stream({ match: PATH.dist }),
   ], cb);
 });
 
