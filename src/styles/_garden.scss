@@ -1,10 +1,9 @@
 @import "variables";
 
-.garden {
-  background-color: $primary-color;
-  height: 100vh;
-  min-width: 50vw;
-  width: calc(100vw - 450px - 2 * #{$content-padding});
+.garden-container {
+  background-color: $garden-backgroundColor;
+  height: $garden-height;
+  width: $garden-width;
 
   canvas {
     position: absolute;

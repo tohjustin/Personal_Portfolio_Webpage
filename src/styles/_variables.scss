@@ -3,5 +3,12 @@ $primary-color: #202b33;
 $black: #333;
 $white: #fff;
 
-// layout + positioning
-$content-padding: 90px;
+// content
+$content-backgroundColor: $white;
+$content-height: 100vh;
+$content-width: 500px;
+
+// garden
+$garden-backgroundColor: $primary-color;
+$garden-height: 100vh;
+$garden-width: calc(100vw - #{$content-width});

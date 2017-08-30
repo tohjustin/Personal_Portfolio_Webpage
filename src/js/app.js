@@ -1,6 +1,7 @@
 import feather from 'feather-icons';
 import Garden from './garden';
 
+const GARDEN_CONTAINER_CLASS = '.garden-container';
 const ICON_SIZE = 28;
 const ICON_STROKE_WIDTH = 2;
 
@@ -19,11 +20,11 @@ ready(() => {
     width: `${ICON_SIZE}px`,
   });
 
-  const $container = document.querySelector('.garden');
-  const g = new Garden($container);
-  g.start();
+  const gardenContainer = document.querySelector(GARDEN_CONTAINER_CLASS);
+  const gardenInstance = new Garden(gardenContainer);
+  gardenInstance.start();
 
   window.addEventListener('resize', () => {
-    g.resize();
+    gardenInstance.resize();
   });
 });

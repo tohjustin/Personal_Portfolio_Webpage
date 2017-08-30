@@ -1,43 +1,39 @@
 @import "variables";
 
-.content {
-  background-color: $white;
+.content-container {
+  align-items: center;
+  background-color: $content-backgroundColor;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: $content-height;
   justify-content: center;
-  max-width: 50vw;
-  padding-left: $content-padding;
-  padding-right: $content-padding;
+  width: $content-width;
+}
+
+.content {
+  width: 350px;
 
   h1 {
-    font-size: 80px;
+    font-size: 64px;
     font-weight: 700;
-    text-align: left;
   }
 
   h2 {
-    font-size: 25px;
+    font-size: 20px;
     font-weight: 700;
+    margin-bottom: 15px;
     margin-top: 10px;
-    text-align: left;
   }
 
-  .links {
-    margin-top: 20px;
-
-    a {
-      color: inherit;
-      margin-right: 15px;
-    }
+  a {
+    color: inherit;
+    margin-right: 15px;
   }
 
   p {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 400;
     line-height: 1.5;
-    margin-top: 40px;
-    max-width: 450px;
-    text-align: left;
+    margin-top: 35px;
   }
 }
