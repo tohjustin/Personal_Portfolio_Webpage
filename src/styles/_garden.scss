@@ -1,11 +1,23 @@
 @import "variables";
 
+// Mobile + Tablet
 .garden-container {
   background-color: $garden-backgroundColor;
-  height: $garden-height;
-  width: $garden-width;
+  height: 100vh;
+  position: absolute;
+  width: 100vw;
+}
 
-  canvas {
-    position: absolute;
+// Desktop
+@media only screen and (min-width: 769px) {
+  .garden-container {
+    background-color: $garden-backgroundColor;
+    height: $garden-height;
+    position: relative;
+    width: $garden-width;
+
+    canvas {
+      position: absolute;
+    }
   }
 }
