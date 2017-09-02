@@ -1,20 +1,27 @@
 @import "variables";
 
-// Mobile + Tablet
+// Mobile
 .garden-container {
   background-color: $garden-backgroundColor;
-  height: 100vh;
+  height: $garden-height;
   position: absolute;
-  width: 100vw;
+  width: $garden-width;
+}
+
+// Tablet
+@media only screen and (min-width: 600px) {
+  .garden-container {
+    height: $garden-height-tablet;
+    width: $garden-width-tablet;
+  }
 }
 
 // Desktop
 @media only screen and (min-width: 769px) {
   .garden-container {
-    background-color: $garden-backgroundColor;
-    height: $garden-height;
+    height: $garden-height-desktop;
     position: relative;
-    width: $garden-width;
+    width: $garden-width-desktop;
 
     canvas {
       position: absolute;

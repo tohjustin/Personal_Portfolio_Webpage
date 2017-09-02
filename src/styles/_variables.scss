@@ -5,10 +5,31 @@ $white: #fff;
 
 // content
 $content-backgroundColor: $white;
-$content-height: 100vh;
-$content-width: 500px;
+$content-minHeight: 400px;
+$content-padding: 0 10px;
+$content-width: 100%;
+$contentContainer-height: 100vh;
+$contentContainer-width: 100vw;
+
+$content-minHeight-tablet: 50%;
+$content-padding-tablet: 0 75px;
+$content-width-tablet: $content-width;
+$contentContainer-height-tablet: $contentContainer-height;
+$contentContainer-width-tablet: $contentContainer-width;
+
+$content-minHeight-desktop: 100%;
+$content-padding-desktop: $content-padding-tablet;
+$content-width-desktop: 100%;
+$contentContainer-height-desktop: $contentContainer-height;
+$contentContainer-width-desktop: 500px;
 
 // garden
 $garden-backgroundColor: $primary-color;
 $garden-height: 100vh;
-$garden-width: calc(100vw - #{$content-width});
+$garden-width: 100vw;
+
+$garden-height-tablet: $garden-height;
+$garden-width-tablet: $garden-width;
+
+$garden-height-desktop: 100vh;
+$garden-width-desktop: calc(100vw - #{$contentContainer-width-desktop});

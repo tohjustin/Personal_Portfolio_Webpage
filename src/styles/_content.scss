@@ -1,12 +1,12 @@
 @import "variables";
 
-// Mobile-first layout
+// Mobile
 .content-container {
   align-items: center;
   display: flex;
   flex-direction: row;
-  height: 100vh;
-  width: 100vw;
+  height: $contentContainer-height;
+  width: $contentContainer-width;
   z-index: 10;
 }
 
@@ -15,9 +15,9 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 60%;
-  padding: 0 10vw;
-  width: 100%;
+  min-height: $content-minHeight;
+  padding: $content-padding;
+  width: $content-width;
 
   h1 {
     font-size: 64px;
@@ -41,29 +41,32 @@
     font-weight: 400;
     line-height: 1.5;
     margin-top: 35px;
+    max-width: 350px;
   }
 }
 
 // Tablet
 @media only screen and (min-width: 600px) {
-  .content {
-    min-height: 50%;
-    padding: 0 75px;
+  .content-container {
+    height: $contentContainer-height-tablet;
+    width: $contentContainer-width-tablet;
   }
 
-  p {
-    width: 350px;
+  .content {
+    min-height: 50%;
+    padding: $content-padding-tablet;
   }
 }
 
 // Desktop
 @media only screen and (min-width: 769px) {
   .content-container {
-    width: $content-width;
+    height: $contentContainer-height-desktop;
+    width: $contentContainer-width-desktop;
   }
 
   .content {
-    height: 100%;
-    padding: 0 75px;
+    min-height: 100%;
+    padding: $content-padding-desktop;
   }
 }
