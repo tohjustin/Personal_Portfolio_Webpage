@@ -10,13 +10,11 @@ const imagemin = require('gulp-imagemin');
 const pump = require('pump');
 const rename = require('gulp-rename');
 const sass = require('gulp-sass');
+const shell = require('gulp-shell');
 const source = require('vinyl-source-stream');
 const sourcemaps = require('gulp-sourcemaps');
 const stylelint = require('gulp-stylelint');
 const uglify = require('gulp-uglify');
-
-// SKETCH FILES
-const shell = require('gulp-shell');
 
 const BASES = {
   app: 'src/',
@@ -27,8 +25,10 @@ const BASES = {
 
 const PATH = {
   app: 'src/js/app.js',
+  exportIcon: 'sketch/exportIcon.sh',
   exportResume: 'sketch/exportResume.sh',
   html: ['src/**/*.html'],
+  icon: ['sketch/icon.sketch'],
   images: ['src/images/*'],
   resume: ['sketch/resume.sketch'],
   scripts: ['src/js/**/*.js', '!js/libs/**/*.js', '!node_modules/**'],
@@ -98,6 +98,13 @@ gulp.task('imagemin', () => {
     .pipe(browserSync.stream({ match: BASES.dist }));
 });
 
+// Run bash script to generate icon .png files
+gulp.task('exportIcon', () => {
+  gulp.src(PATH.icon)
+    .pipe(shell([`${PATH.exportIcon} <%= file.path %>`]))
+    .pipe(browserSync.stream({ match: BASES.dist }));
+});
+
 // Run bash script to generate resume .pdf & .png files
 gulp.task('exportResume', () => {
   gulp.src(PATH.resume)
@@ -111,12 +118,14 @@ gulp.task('watch', () => {
     injectChanges: true,
     server: `${BASES.root}`,
   });
+
   gulp.watch(PATH.html, ['html']).on('change', browserSync.reload);
-  gulp.watch(PATH.resume, ['exportResume']);
+  gulp.watch(PATH.icon, ['exportIcon']);
   gulp.watch(PATH.images, ['imagemin']);
+  gulp.watch(PATH.resume, ['exportResume']);
   gulp.watch(PATH.scripts, ['scripts']);
   gulp.watch(PATH.styles, ['styles']);
 });
 
-gulp.task('build', ['html', 'styles', 'scripts', 'imagemin', 'exportResume']);
+gulp.task('build', ['html', 'styles', 'scripts', 'exportIcon', 'exportResume', 'imagemin']);
 gulp.task('serve', ['build', 'watch']);
