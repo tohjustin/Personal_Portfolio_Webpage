@@ -38,8 +38,7 @@ const PATH = {
 // Github user pages requires index.html to be in master branch, root dir
 gulp.task('html', () => {
   gulp.src(PATH.html)
-    .pipe(gulp.dest(BASES.root))
-    .pipe(browserSync.stream({ match: BASES.root }));
+    .pipe(gulp.dest(BASES.root));
 });
 
 // Process SCSS files and concatenate them into one output file
@@ -112,7 +111,7 @@ gulp.task('watch', () => {
     injectChanges: true,
     server: `${BASES.root}`,
   });
-  gulp.watch(PATH.html, ['html']);
+  gulp.watch(PATH.html, ['html']).on('change', browserSync.reload);
   gulp.watch(PATH.resume, ['exportResume']);
   gulp.watch(PATH.images, ['imagemin']);
   gulp.watch(PATH.scripts, ['scripts']);
