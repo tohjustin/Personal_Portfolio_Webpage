@@ -1,6 +1,8 @@
 // color
-$primary-color: #202b33;
 $black: #333;
+$grey: #ccc;
+$primary-color: #202b33;
+$primary-color-light: #30414d;
 $white: #fff;
 
 // content
@@ -22,6 +24,12 @@ $content-padding-desktop: $content-padding-tablet;
 $content-width-desktop: 100%;
 $contentContainer-height-desktop: $contentContainer-height;
 $contentContainer-width-desktop: 500px;
+
+// content link
+$icon-margin: 15px;
+$icon-size: 31px;
+$icon-count: 4;
+$linksContainer-width: calc(((#{$icon-count} - 1) * #{$icon-margin}) + ($icon-count * #{$icon-size}));
 
 // garden
 $garden-backgroundColor: $primary-color;
