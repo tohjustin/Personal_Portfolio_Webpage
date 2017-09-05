@@ -27,9 +27,9 @@ $contentContainer-width-desktop: 500px;
 
 // content link
 $icon-margin: 15px;
-$icon-size: 31px;
+$icon-size: 33px;
 $icon-count: 4;
-$linksContainer-width: calc(((#{$icon-count} - 1) * #{$icon-margin}) + ($icon-count * #{$icon-size}));
+$linksContainer-width: calc(((#{$icon-count} - 1) * #{$icon-margin}) + (#{$icon-count} * #{$icon-size}));
 
 // garden
 $garden-backgroundColor: $primary-color;
