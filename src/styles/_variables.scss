@@ -14,13 +14,13 @@ $contentContainer-height: 100vh;
 $contentContainer-width: 100vw;
 
 $content-minHeight-tablet: 50%;
-$content-padding-tablet: 0 75px;
+$content-padding-tablet: 10px 75px;
 $content-width-tablet: $content-width;
 $contentContainer-height-tablet: $contentContainer-height;
 $contentContainer-width-tablet: $contentContainer-width;
 
 $content-minHeight-desktop: 100%;
-$content-padding-desktop: $content-padding-tablet;
+$content-padding-desktop: 0 75px;
 $content-width-desktop: 100%;
 $contentContainer-height-desktop: $contentContainer-height;
 $contentContainer-width-desktop: 500px;
