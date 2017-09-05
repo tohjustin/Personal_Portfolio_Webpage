@@ -1,7 +1,18 @@
-/* eslint-disable */
+const INITIAL_VELOCITY = 0.5;
+const NODE_SIZE_VARIATION = 2;
+const NODE_SIZE_MIN = 1;
+const PARTICLE_DENSITY_COEFFICIENT = 10; // lower value = more particles
+const PARTICLE_FILL_COLOR = '#fff';
+const PARTICLE_STROKE_COLOR = '#bfbfbf';
 
-function defined(a, b) {
-  return a != null ? a : b;
+function hexToRgba(hexValue, opacityValue = 1) {
+  const opacity = Math.min(opacityValue, 1);
+  const hex = hexValue.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
+  return `rgba(${r},${g},${b},${opacity})`;
 }
 
 class Node {
@@ -11,40 +22,16 @@ class Node {
   }
 
   reset() {
-    const initialSpeed = 0.5;
     this.x = Math.random() * this.garden.width;
     this.y = Math.random() * this.garden.height;
-    this.vx = (Math.random() * initialSpeed) - (initialSpeed / 2);
-    this.vy = (Math.random() * initialSpeed) - (initialSpeed / 2);
-    this.r = (Math.random() * 2.5) + 1.1;
-    this.speed = 20;
-  }
-
-  getDiameter() {
-    return this.r;
+    this.vx = (Math.random() * INITIAL_VELOCITY) - (INITIAL_VELOCITY / 2);
+    this.vy = (Math.random() * INITIAL_VELOCITY) - (INITIAL_VELOCITY / 2);
+    this.r = (Math.random() * NODE_SIZE_VARIATION) + NODE_SIZE_MIN;
+    this.speed = Math.sqrt((this.vx ** 2) + (this.vy ** 2));
   }
 
   squaredDistance(node) {
     return ((node.x - this.x) ** 2) + ((node.y - this.y) ** 2);
-  }
-
-  addForce(force, direction) {
-    this.vx += (force * direction.x) / this.r;
-    this.vy += (force * direction.y) / this.r;
-  }
-
-  distanceTo(node) {
-    const x = node.x - this.x;
-    const y = node.y - this.y;
-    const total = Math.sqrt((x ** this.speed) + (y ** this.speed));
-
-    return { x, y, total };
-  }
-
-  collideTo(node) {
-    node.vx = ((node.r * node.vx) + (this.r * this.vx)) / (this.r + node.r);
-    node.vy = ((node.r * node.vy) + (this.r * this.vy)) / (this.r + node.r);
-    this.reset();
   }
 
   update() {
@@ -60,7 +47,7 @@ class Node {
 
   render() {
     this.garden.ctx.beginPath();
-    this.garden.ctx.arc(this.x, this.y, this.getDiameter(), 0, 2 * Math.PI);
+    this.garden.ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
     this.garden.ctx.fill();
   }
 }
@@ -76,6 +63,12 @@ class Garden {
     this.canvas.id = 'garden';
     this.resize();
     this.container.appendChild(this.canvas);
+  }
+
+  static computeStrokeStyle(nodeA, nodeB) {
+    const squaredDistance = nodeA.squaredDistance(nodeB);
+    const force = (3 * nodeA.r * nodeB.r) / squaredDistance;
+    return hexToRgba(PARTICLE_STROKE_COLOR, force * 100);
   }
 
   start() {
@@ -95,11 +88,11 @@ class Garden {
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
     this.area = this.width * this.height;
-    this.nodes.length = Math.sqrt(this.area) / 15 | 0;
+    this.nodes.length = Math.trunc(Math.sqrt(this.area) / PARTICLE_DENSITY_COEFFICIENT);
 
     this.canvas.width = this.width;
     this.canvas.height = this.height;
-    this.ctx.fillStyle = '#fff';
+    this.ctx.fillStyle = PARTICLE_FILL_COLOR;
 
     for (let i = 0; i < this.nodes.length; i += 1) {
       if (!this.nodes[i]) {
@@ -122,48 +115,26 @@ class Garden {
 
     this.ctx.clearRect(0, 0, this.width, this.height);
 
-    let nodeA;
-    let nodeB;
-
+    // Render lines between particles
     for (let i = 0; i < this.nodes.length - 1; i += 1) {
-      nodeA = this.nodes[i];
+      const nodeA = this.nodes[i];
       for (let j = i + 1; j < this.nodes.length; j += 1) {
-        nodeB = this.nodes[j];
-        const squaredDistance = nodeA.squaredDistance(nodeB);
-        const force = (3 * nodeA.r * nodeB.r) / squaredDistance;
-        const opacity = force * 100;
-
-        if (squaredDistance <= Math.pow((nodeA.r / 2) + (nodeB.r / 2), 2)) {
-          if (nodeA.r <= nodeB.r) {
-            nodeA.collideTo(nodeB);
-          } else {
-            nodeB.collideTo(nodeA);
-          }
-          continue;
-        }
-
-        const distance = nodeA.distanceTo(nodeB);
-        const direction = {
-          x: distance.x / distance.total,
-          y: distance.y / distance.total,
-        };
+        const nodeB = this.nodes[j];
 
         this.ctx.beginPath();
-        this.ctx.strokeStyle = `rgba(191,191,191,${(opacity < 1 ? opacity : 1)})`;
+        this.ctx.strokeStyle = Garden.computeStrokeStyle(nodeA, nodeB);
         this.ctx.moveTo(nodeA.x, nodeA.y);
         this.ctx.lineTo(nodeB.x, nodeB.y);
         this.ctx.stroke();
-
-        nodeA.addForce(force, direction);
-        nodeB.addForce(-force, direction);
       }
     }
 
+    // Render particles
     for (let k = 0; k < this.nodes.length; k += 1) {
       this.nodes[k].render();
       this.nodes[k].update();
     }
-  } 
+  }
 }
 
 export default Garden;
