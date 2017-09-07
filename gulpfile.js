@@ -43,12 +43,12 @@ gulp.task('stylelint', (cb) => {
 gulp.task('styles', ['stylelint'], (cb) => {
   pump([
     gulp.src(CONFIG.path.styles),
-    CONFIG.sourcemap, $.sourcemaps.init(),
+    $.if(CONFIG.sourcemap, $.sourcemaps.init()),
     $.sass().on('error', $.sass.logError),
     $.autoprefixer({ browsers: ['last 2 versions'] }),
     $.rename({ basename: 'style', suffix: '.min' }),
     $.cleanCss(),
-    CONFIG.sourcemap, $.sourcemaps.write('/'),
+    $.if(CONFIG.sourcemap, $.sourcemaps.write('/')),
     gulp.dest(CONFIG.bases.dist),
     browserSync.stream({ match: CONFIG.path.dist }),
   ], cb);
@@ -72,9 +72,9 @@ gulp.task('scripts', ['eslint'], (cb) => {
       .bundle(),
     vinylSource('app.min.js'),
     vinylBuffer(),
-    CONFIG.sourcemap, $.sourcemaps.init({ loadMaps: true }),
+    $.if(CONFIG.sourcemap, $.sourcemaps.init({ loadMaps: true })),
     $.babelMinify(),
-    CONFIG.sourcemap, $.sourcemaps.write('/'),
+    $.if(CONFIG.sourcemap, $.sourcemaps.write('/')),
     gulp.dest(CONFIG.bases.dist),
     browserSync.stream({ match: CONFIG.path.dist }),
   ], cb);
