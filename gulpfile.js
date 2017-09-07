@@ -14,7 +14,7 @@ const shell = require('gulp-shell');
 const source = require('vinyl-source-stream');
 const sourcemaps = require('gulp-sourcemaps');
 const stylelint = require('gulp-stylelint');
-const uglify = require('gulp-uglify');
+const uglify = require('gulp-uglify-es').default;
 
 const BASES = {
   app: 'src/',
@@ -58,7 +58,7 @@ gulp.task('styles', ['stylelint'], (cb) => {
     autoprefixer({ browsers: ['last 2 versions'] }),
     rename({ basename: 'style', suffix: '.min' }),
     cleancss(),
-    sourcemaps.write('/maps'),
+    sourcemaps.write('/'),
     gulp.dest(BASES.dist),
     browserSync.stream({ match: PATH.dist }),
   ], cb);
@@ -84,7 +84,7 @@ gulp.task('scripts', ['eslint'], (cb) => {
     buffer(),
     sourcemaps.init({ loadMaps: true }),
     uglify(),
-    sourcemaps.write('/maps'),
+    sourcemaps.write('/'),
     gulp.dest(BASES.dist),
     browserSync.stream({ match: PATH.dist }),
   ], cb);
