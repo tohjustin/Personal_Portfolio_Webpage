@@ -6,12 +6,12 @@ const cleancss = require('gulp-clean-css');
 const eslint = require('gulp-eslint');
 const gulp = require('gulp');
 const imagemin = require('gulp-imagemin');
+const minify = require('gulp-babel-minify');
 const pump = require('pump');
 const rename = require('gulp-rename');
 const sass = require('gulp-sass');
 const sourcemaps = require('gulp-sourcemaps');
 const stylelint = require('gulp-stylelint');
-const uglify = require('gulp-uglify-es').default;
 const vinylBuffer = require('vinyl-buffer');
 const vinylSource = require('vinyl-source-stream');
 
@@ -78,7 +78,7 @@ gulp.task('scripts', ['eslint'], (cb) => {
     vinylSource('app.min.js'),
     vinylBuffer(),
     sourcemaps.init({ loadMaps: true }),
-    uglify(),
+    minify(),
     sourcemaps.write('/'),
     gulp.dest(BASES.dist),
     browserSync.stream({ match: PATH.dist }),
