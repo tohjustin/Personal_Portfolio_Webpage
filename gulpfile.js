@@ -2,7 +2,6 @@ const autoprefixer = require('gulp-autoprefixer');
 const babelify = require('babelify');
 const browserify = require('browserify');
 const browserSync = require('browser-sync');
-const buffer = require('vinyl-buffer');
 const cleancss = require('gulp-clean-css');
 const eslint = require('gulp-eslint');
 const gulp = require('gulp');
@@ -10,11 +9,11 @@ const imagemin = require('gulp-imagemin');
 const pump = require('pump');
 const rename = require('gulp-rename');
 const sass = require('gulp-sass');
-const shell = require('gulp-shell');
-const source = require('vinyl-source-stream');
 const sourcemaps = require('gulp-sourcemaps');
 const stylelint = require('gulp-stylelint');
 const uglify = require('gulp-uglify-es').default;
+const vinylBuffer = require('vinyl-buffer');
+const vinylSource = require('vinyl-source-stream');
 
 const BASES = {
   app: 'src/',
@@ -25,12 +24,8 @@ const BASES = {
 
 const PATH = {
   app: 'src/js/app.js',
-  exportIcon: 'sketch/exportIcon.sh',
-  exportResume: 'sketch/exportResume.sh',
   html: ['src/**/*.html'],
-  icon: ['sketch/icon.sketch'],
   images: ['src/images/*'],
-  resume: ['sketch/resume.sketch'],
   scripts: ['src/js/**/*.js', '!js/libs/**/*.js', '!node_modules/**'],
   styles: ['src/styles/**/*.scss', 'src/styles/**/*.sass', 'src/styles/**/*.css'],
 };
@@ -80,8 +75,8 @@ gulp.task('scripts', ['eslint'], (cb) => {
     browserify({ entries: PATH.app, debug: true })
       .transform(babelify, { presets: ['es2015'], sourceMaps: true })
       .bundle(),
-    source('app.min.js'),
-    buffer(),
+    vinylSource('app.min.js'),
+    vinylBuffer(),
     sourcemaps.init({ loadMaps: true }),
     uglify(),
     sourcemaps.write('/'),
@@ -95,20 +90,6 @@ gulp.task('imagemin', () => {
   gulp.src(PATH.images)
     .pipe(imagemin())
     .pipe(gulp.dest(BASES.images))
-    .pipe(browserSync.stream({ match: BASES.dist }));
-});
-
-// Run bash script to generate icon .png files
-gulp.task('exportIcon', () => {
-  gulp.src(PATH.icon)
-    .pipe(shell([`${PATH.exportIcon} <%= file.path %>`]))
-    .pipe(browserSync.stream({ match: BASES.dist }));
-});
-
-// Run bash script to generate resume .pdf & .png files
-gulp.task('exportResume', () => {
-  gulp.src(PATH.resume)
-    .pipe(shell([`${PATH.exportResume} <%= file.path %>`]))
     .pipe(browserSync.stream({ match: BASES.dist }));
 });
 
@@ -127,5 +108,5 @@ gulp.task('watch', () => {
   gulp.watch(PATH.styles, ['styles']);
 });
 
-gulp.task('build', ['html', 'styles', 'scripts', 'exportIcon', 'exportResume', 'imagemin']);
+gulp.task('build', ['html', 'imagemin', 'styles', 'scripts']);
 gulp.task('serve', ['build', 'watch']);
