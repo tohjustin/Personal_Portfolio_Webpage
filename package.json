@@ -8,7 +8,7 @@
     "export:icons": "sketch/exportIcon.sh sketch/icon.sketch",
     "export:resume": "sketch/exportResume.sh sketch/resume.sketch",
     "export": "npm-run-all -p export:**",
-    "start": "npm-run-all -p clean export:icons && gulp serve"
+    "start": "npm-run-all -p clean export && gulp serve"
   },
   "dependencies": {
     "feather-icons": "^3.2.2"
