@@ -20,18 +20,26 @@
   width: $content-width;
 
   h1 {
-    font-size: 64px;
+    font-size: 60px;
     font-weight: 700;
   }
 
   h2 {
     font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 15px;
-    margin-top: 10px;
+    font-weight: 600;
+    margin-top: 18px;
+  }
+
+  p {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    margin-top: 8px;
+    max-width: 350px;
   }
 
   .links-container {
+    margin-top: 24px;
     width: $linksContainer-width;
 
     // When an icon is hovered, make all its other sibling grey in color
@@ -44,21 +52,13 @@
       color: inherit;
 
       &:hover {
-        color: $primary-color-light;
+        color: $black;
       }
 
       &:not(:last-child) {
         margin-right: $icon-margin;
       }
     }
-  }
-
-  p {
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 1.5;
-    margin-top: 35px;
-    max-width: 350px;
   }
 }
 
