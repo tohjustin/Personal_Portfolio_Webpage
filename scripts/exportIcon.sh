@@ -18,7 +18,7 @@ sketchtool export artboards \
 
 # Takes in an image file & make copies of it in different sizes (based on webpage icon sizes)
 inputFile="$TEMP_DIR/${OUTPUT_FILENAME}.png"
-if [[ -f $inputFile ]]; then 
+if [[ -f $inputFile ]]; then
   fileFullname=$(basename "$inputFile") # converts "/path/to/dir/name.txt" to "name.txt"
   fileDir=$(dirname "$inputFile") # converts "/path/to/dir/name.txt" to "/path/to/dir"
   fileExt="${fileFullname##*.}" # converts "name.txt" to "txt"

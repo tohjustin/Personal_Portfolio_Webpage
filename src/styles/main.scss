@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Lato:400,700');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap');
 @import "reset";
 @import "variables";
 @import "content";
@@ -10,8 +10,9 @@ body {
   color: $black;
   display: flex;
   flex-direction: row;
-  font-family: 'Lato', sans-serif;
-  -webkit-font-smoothing: antialiased;
+  font-family: 'Open Sans', sans-serif;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.4;
   position: relative;
 }

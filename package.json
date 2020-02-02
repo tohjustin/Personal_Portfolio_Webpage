@@ -11,8 +11,9 @@
   "scripts": {
     "build": "npm-run-all -p clean export && gulp build --production",
     "clean": "rimraf dist && rimraf index.html",
-    "export:icons": "sketch/exportIcon.sh sketch/icon.sketch",
-    "export:resume": "sketch/exportResume.sh sketch/resume.sketch",
+    "export:assets": "scripts/exportPdf.sh",
+    "export:icons": "scripts/exportIcon.sh assets/icon.sketch",
+    "export:resume": "scripts/exportResume.sh assets/resume.sketch",
     "export": "npm-run-all -p export:**",
     "start": "npm-run-all -p clean export && gulp serve"
   },

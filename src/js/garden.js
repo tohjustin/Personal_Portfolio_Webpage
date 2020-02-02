@@ -1,7 +1,7 @@
 const INITIAL_VELOCITY = 0.5;
 const NODE_SIZE_VARIATION = 2;
 const NODE_SIZE_MIN = 1;
-const PARTICLE_DENSITY_COEFFICIENT = 10; // lower value = more particles
+const PARTICLE_DENSITY_COEFFICIENT = 15; // lower value = more particles
 const PARTICLE_FILL_COLOR = '#fff';
 const PARTICLE_STROKE_COLOR = '#bfbfbf';
 
