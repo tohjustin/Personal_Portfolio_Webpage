@@ -37,10 +37,10 @@ class Node {
   update() {
     this.x += this.vx;
     this.y += this.vy;
-    if (this.x > this.garden.width + 50 ||
-      this.x < -50 ||
-      this.y > this.garden.height + 50 ||
-      this.y < -50) {
+    if (this.x > this.garden.width + 50
+      || this.x < -50
+      || this.y > this.garden.height + 50
+      || this.y < -50) {
       this.reset();
     }
   }

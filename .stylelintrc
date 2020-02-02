@@ -4,10 +4,11 @@
     "stylelint-order"
   ],
   "rules": {
+    "at-rule-no-unknown": null,
     "order/order": [
         "custom-properties",
         "declarations"
     ],
-    "order/properties-alphabetical-order": true
+    "order/properties-alphabetical-order": true,
   }
 }

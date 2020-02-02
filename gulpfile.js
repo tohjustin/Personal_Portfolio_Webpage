@@ -26,82 +26,83 @@ const CONFIG = {
 };
 
 // Github user pages requires index.html to be in master branch, root dir
-gulp.task('html', () => {
+gulp.task('html', (done) => {
   gulp.src(CONFIG.path.html)
     .pipe(gulp.dest(CONFIG.bases.root));
+  done();
 });
 
 // Process SCSS files and concatenate them into one output file
-gulp.task('stylelint', (cb) => {
+gulp.task('stylelint', (done) => {
   pump([
     gulp.src(CONFIG.path.styles),
     $.stylelint({ reporters: [{ formatter: 'string', console: true }] }),
-  ], cb);
+  ], done);
 });
 
 // Process SCSS files and concatenate them into one output file
-gulp.task('styles', ['stylelint'], (cb) => {
+gulp.task('styles', gulp.series('stylelint', (done) => {
   pump([
     gulp.src(CONFIG.path.styles),
     $.if(CONFIG.sourcemap, $.sourcemaps.init()),
     $.sass().on('error', $.sass.logError),
-    $.autoprefixer({ browsers: ['last 2 versions'] }),
+    $.autoprefixer(),
     $.rename({ basename: 'style', suffix: '.min' }),
     $.cleanCss(),
     $.if(CONFIG.sourcemap, $.sourcemaps.write('/')),
     gulp.dest(CONFIG.bases.dist),
     browserSync.stream({ match: CONFIG.path.dist }),
-  ], cb);
-});
+  ], done);
+}));
 
-// Lint JS code with eslint
-gulp.task('eslint', (cb) => {
+// Lint JS code with ESLint
+gulp.task('eslint', (done) => {
   pump([
     gulp.src(CONFIG.path.scripts),
     $.eslint(),
     $.eslint.format(),
     $.eslint.failAfterError(),
-  ], cb);
+  ], done);
 });
 
 // Transpile JS code
-gulp.task('scripts', ['eslint'], (cb) => {
+gulp.task('scripts', gulp.series('eslint', (done) => {
   pump([
     browserify({ entries: CONFIG.path.app, debug: true })
-      .transform(babelify, { presets: ['es2015'], sourceMaps: true })
+      .transform(babelify, { presets: ['@babel/preset-env'], sourceMaps: true })
       .bundle(),
     vinylSource('app.min.js'),
     vinylBuffer(),
     $.if(CONFIG.sourcemap, $.sourcemaps.init({ loadMaps: true })),
-    $.babelMinify(),
+    $.uglify(),
     $.if(CONFIG.sourcemap, $.sourcemaps.write('/')),
     gulp.dest(CONFIG.bases.dist),
     browserSync.stream({ match: CONFIG.path.dist }),
-  ], cb);
-});
+  ], done);
+}));
 
 // Minify images, output them in dist
-gulp.task('imagemin', () => {
+gulp.task('imagemin', (done) => {
   gulp.src(CONFIG.path.images)
     .pipe($.imagemin())
     .pipe(gulp.dest(CONFIG.bases.images))
     .pipe(browserSync.stream({ match: CONFIG.bases.dist }));
+  done();
 });
 
-gulp.task('watch', () => {
+gulp.task('watch', (done) => {
   browserSync.create();
   browserSync.init({
     injectChanges: true,
     server: `${CONFIG.bases.root}`,
   });
 
-  gulp.watch(CONFIG.path.html, ['html']).on('change', browserSync.reload);
-  gulp.watch(CONFIG.path.icon, ['exportIcon']);
-  gulp.watch(CONFIG.path.images, ['imagemin']);
-  gulp.watch(CONFIG.path.resume, ['exportResume']);
-  gulp.watch(CONFIG.path.scripts, ['scripts']);
-  gulp.watch(CONFIG.path.styles, ['styles']);
+  gulp.watch(CONFIG.path.html, gulp.series('html')).on('change', browserSync.reload);
+  gulp.watch(CONFIG.path.images, gulp.series('imagemin'));
+  gulp.watch(CONFIG.path.scripts, gulp.series('scripts'));
+  gulp.watch(CONFIG.path.styles, gulp.series('styles'));
+  done();
 });
 
-gulp.task('build', ['html', 'imagemin', 'styles', 'scripts']);
-gulp.task('serve', ['build', 'watch']);
+gulp.task('build', gulp.series('html', 'imagemin', 'styles', 'scripts'));
+gulp.task('serve', gulp.series('build', 'watch'));
