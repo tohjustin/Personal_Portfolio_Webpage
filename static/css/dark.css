@@ -1,0 +1,36 @@
+:root {
+    --main-color: #7ad3ff;
+    --bg-color: #131519;
+    --text-color: #ddd;
+    --text-secondary-color: #999;
+    --border-color: #282C34;
+    --header-border-color: #282C34;
+    --highlight-color: #ddd;
+    --highlight-bg-color: #282C34;
+    --selection-bg-color: #666;
+    --label-text-color: #282C34;
+    --label-bg-color: #282C34;
+    --table-bg-color: #282C34;
+    --table-border-color: #666;
+}
+
+blockquote {
+    color: var(--text-secondary-color);
+}
+
+a:hover {
+    opacity: 0.8;
+}
+
+.post .draft-label {
+    color: var(--text-color);
+}
+
+.site-description a, .site-description a:hover {
+    color: var(--text-color);
+}
+
+.post-tags .tags a {
+    border: 1px solid var(--text-color);
+    color: var(--text-color);
+}
