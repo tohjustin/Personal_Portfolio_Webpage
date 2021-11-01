@@ -3,7 +3,6 @@ title: "kube-lineage: A CLI tool for visualizing Kubernetes object relationships
 description: "kube-lineage is a CLI tool that allows users to view all dependents or dependencies of a given Kubernetes object so that they can better understand how objects in a cluster are related to each other."
 date: 2021-11-01T21:00:00+08:00
 tags: [helm, kubectl-plugin, kubernetes]
-draft: true
 ---
 
 [kube-lineage](https://github.com/tohjustin/kube-lineage) is a CLI tool for visualizing Kubernetes object relationships. It allows users to view all dependents or dependencies of a given Kubernetes object so that they can better understand how objects in a cluster are related to each other.
