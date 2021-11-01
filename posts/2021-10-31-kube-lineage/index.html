@@ -1,0 +1,200 @@
+<!doctype html><html>
+<head>
+<meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge"><title>kube-lineage: A CLI tool for visualizing Kubernetes object relationships - tohjustin's blog</title><link rel=icon type=image/png href=icons/favicon.png><meta name=viewport content="width=device-width,initial-scale=1">
+<meta property="og:title" content="kube-lineage: A CLI tool for visualizing Kubernetes object relationships">
+<meta property="og:description" content="kube-lineage is a CLI tool that allows users to view all dependents or dependencies of a given Kubernetes object so that they can better understand how objects in a cluster are related to each other.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://tohjustin.github.io/posts/2021-10-31-kube-lineage/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2021-11-01T21:00:00+08:00">
+<meta property="article:modified_time" content="2021-11-01T21:00:00+08:00">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="kube-lineage: A CLI tool for visualizing Kubernetes object relationships">
+<meta name=twitter:description content="kube-lineage is a CLI tool that allows users to view all dependents or dependencies of a given Kubernetes object so that they can better understand how objects in a cluster are related to each other.">
+<link rel=preconnect href=https://fonts.googleapis.com>
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Raleway:wght@200;600&family=Ubuntu:wght@400;700&display=swap" rel=stylesheet>
+<link rel=stylesheet type=text/css media=screen href=https://tohjustin.github.io/css/normalize.css>
+<link rel=stylesheet type=text/css media=screen href=https://tohjustin.github.io/css/main.css><link rel=stylesheet type=text/css href=https://tohjustin.github.io/css/dark.css>
+<script src=https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js></script>
+<script src=https://tohjustin.github.io/js/main.js></script>
+</head>
+<body>
+<div class="container wrapper post">
+<div class=header>
+<base href=https://tohjustin.github.io/>
+<h1 class=site-title><a href=https://tohjustin.github.io/>tohjustin's blog</a></h1>
+<div class=site-description><h2>YAML Engineer. Previously pushing packets & pixels.</h2><nav class="nav social">
+<ul class=flat><a href=https://github.com/tohjustin title=Github><i data-feather=github></i></a><a href=https://twitter.com/tohjustin_ title=Twitter><i data-feather=twitter></i></a><a href=/index.xml title=RSS><i data-feather=rss></i></a></ul>
+</nav>
+</div>
+<nav class=nav>
+<ul class=flat>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/posts>All posts</a>
+</li>
+<li>
+<a href=/tags>Tags</a>
+</li>
+</ul>
+</nav>
+</div>
+<div class=post-header>
+<h1 class=title>kube-lineage: A CLI tool for visualizing Kubernetes object relationships</h1>
+<div class=meta>Posted at &mdash; Nov 1, 2021</div>
+</div>
+<div class=markdown>
+<p><a href=https://github.com/tohjustin/kube-lineage>kube-lineage</a> is a CLI tool for visualizing Kubernetes object relationships. It allows users to view all dependents or dependencies of a given Kubernetes object so that they can better understand how objects in a cluster are related to each other.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl lineage clusterrole/system:metrics-server
+NAMESPACE     NAME                                                     READY   STATUS    AGE
+              ClusterRole/system:metrics-server                        -                 5m
+              └── ClusterRoleBinding/system:metrics-server             -                 5m
+kube-system       └── ServiceAccount/metrics-server                    -                 5m
+kube-system           ├── Pod/metrics-server-7b4f8b595-8m7rz           1/1     Running   5m
+kube-system           │   └── Service/metrics-server                   -                 5m
+                      │       ├── APIService/v1beta1.metrics.k8s.io    True              5m
+kube-system           │       └── EndpointSlice/metrics-server-wb2cm   -                 5m
+kube-system           └── Secret/metrics-server-token-nqw85            -                 5m
+kube-system               └── Pod/metrics-server-7b4f8b595-8m7rz       1/1     Running   5m
+</code></pre></div><p>kube-lineage is available as kubectl plugin that you can install via the <a href=https://krew.sigs.k8s.io/>krew plugin manager</a>.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>kubectl krew install lineage
+</code></pre></div><h2 id=motivation>Motivation</h2>
+<p><code>kubectl</code> is the primary tool most users use to interact with their Kubernetes cluster. Since it doesn&rsquo;t have a built-in command to display related Kubernetes objects, understanding how each Kubernetes object in a cluster are related to one another isn&rsquo;t straightforward task.</p>
+<p>Just a few months ago, I discovered <a href=https://github.com/ahmetb/kubectl-tree>kubectl-tree</a> — a kubectl plugin that helps to visualize <a href=https://kubernetes.io/docs/concepts/overview/working-with-objects/owners-dependents/>object ownership</a> in a similar manner to the <a href=https://en.wikipedia.org/wiki/Tree_(command)>tree</a> command found in most operating systems.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl tree deployment traefik
+NAMESPACE    NAME                             READY  REASON  AGE
+kube-system  Deployment/traefik               -              14d
+kube-system  └─ReplicaSet/traefik-5dd496474   -              14d
+kube-system    └─Pod/traefik-5dd496474-cr6d8  True           14d
+</code></pre></div><p>It allows users to view all the dependents of a given Kubernetes object with a single command. The tool was a game changer for me as I discovered lots of new owner-dependent relationships that I wasn&rsquo;t aware of:</p>
+<ul>
+<li><code>ControllerRevision</code> being used by <code>DaemonSet</code> & <code>StatefulSet</code> for updates & rollbacks.</li>
+<li><code>Lease</code> being used to represent <code>Node</code> heartbeats (see <a href=https://github.com/kubernetes/enhancements/blob/master/keps/sig-node/589-efficient-node-heartbeats/README.md>Efficient Node Heartbeats KEP</a>).</li>
+</ul>
+<p>However I also discovered a lot of new questions that the tool wasn&rsquo;t able to answer:</p>
+<blockquote>
+<p>&ldquo;Which resources are referencing this <code>Secret</code>?&rdquo;</p>
+<p>&ldquo;Which <code>Pods</code> are using this <code>ServiceAccount</code>?&rdquo;</p>
+<p>&ldquo;Which <code>ServiceAccounts</code> are bound to this <code>ClusterRole</code>?&rdquo;</p>
+<p>&ldquo;Are there any <code>Ingresses</code> or <code>ValidatingWebhookConfigurations</code> dependent on this <code>Pod</code>?&rdquo;</p>
+</blockquote>
+<p>Some of the questions could definitely answered by other existing kubectl-plugins, but I was looking for a single tool to answer all of them (hopefully) & hence I decided to build kube-lineage.</p>
+<h2 id=initial-research>Initial Research</h2>
+<p>Initially I tried to find out if there were any existing APIs in the Kubernetes control plane that I could use for object relationship discovery. The garbage collector controller was a promising option as it tracked the ownership of all objects in the cluster & the data is accessible via an API:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl get --raw /debug/controllers/garbagecollector/graph --server=$KUBE_CONTROLLER_MANAGER
+strict digraph full {
+  // Node definitions.
+  0 [
+    label=&#34;\&#34;uid=dd415bed-dcdb-45fb-ad8e-9c946171cf1c\nnamespace=kube-system\nPod.v1/coredns-7448499f4d-zn8cl\n\&#34;&#34;
+    group=&#34;&#34;
+    version=&#34;v1&#34;
+    kind=&#34;Pod&#34;
+    namespace=&#34;kube-system&#34;
+    name=&#34;coredns-7448499f4d-zn8cl&#34;
+    uid=&#34;dd415bed-dcdb-45fb-ad8e-9c946171cf1c&#34;
+...
+</code></pre></div><p>However it wasn&rsquo;t feasible for the following reasons:</p>
+<ol>
+<li>The endpoint is meant for debugging purposes: The output format can change anytime & I wasn&rsquo;t sure if it is available on all Kubernetes distributions.</li>
+<li>Accessing the endpoint requires admin-level privileges: A deal-breaker if I wanted the tool to work for any users with <code>kubectl</code> access.</li>
+<li>It can only discover owner-dependent relationships.</li>
+</ol>
+<h2 id=implementation>Implementation</h2>
+<p>I ended up copying kubectl-tree&rsquo;s approach, which can be summarized into these four steps:</p>
+<ol>
+<li>List all available API resources in the cluster.</li>
+<li>For each available API resource, list all objects.</li>
+<li>For each object, scan through its fields & construct a relationship graph where each node in the graph would represent a Kubernetes object.</li>
+<li>Print out all the nodes in the graph that are connected to the &ldquo;root node&rdquo; (i.e. the node that corresponds to Kubernetes object specified in the command argument).</li>
+</ol>
+<p>The main difference in kube-lineage&rsquo;s implementation is in step #3. Instead of only looking at the <code>.metadata.ownerReferences</code> field of every object to identify owner-dependent relationships, we additionally implement custom logic for each Kubernetes resource type to discover other forms of relationships. For example:</p>
+<ul>
+<li>When handling a <code>events.v1</code> object, we look at its <code>involvedobject.uid</code> field & mark the object with matching UID as related to the event object.</li>
+<li>When handling a <code>services.v1</code> object, we look at its <code>spec.selector</code> field, find all the pods in the service&rsquo;s namespace that matches the selector & mark all of them as related to the service object.</li>
+</ul>
+<h2 id=adding-helm-support>Adding Helm Support</h2>
+<p>Now that we have the ability to visualize object relationships in the cluster, I had a new question that I wanted to answer regarding <a href=https://helm.sh/docs/helm/helm_get_manifest/#helm>Helm</a>, the de facto package manager for Kubernetes:</p>
+<blockquote>
+<p>&ldquo;What are the list of resources associated to a specific Helm release?&rdquo;</p>
+</blockquote>
+<p>Since a <a href=https://helm.sh/docs/glossary/#release>Helm release</a> isn&rsquo;t an actual Kubernetes resource but a construct that exists only in Helm, we needed a new input format or flag to specify a Helm release instead of a Kubernetes object for our tool.</p>
+<p>One of the design goal that I had from the start was intentionally make the input formats & flags as similar to <code>kubectl get</code> as possible to reduce the initial learning curve for users. To avoid introducing a new input format or flag(s) to the existing command, a separate <code>helm</code> subcommand was created for this feature instead.</p>
+<p>The <code>helm</code> subcommand uses a rather similar implementation:</p>
+<ol>
+<li>List all Kubernetes objects associated with the specified Helm release.</li>
+<li>List all available API resources in the cluster.</li>
+<li>For each available API resource, list all objects.</li>
+<li>For each object, scan through its fields & construct a relationship graph.</li>
+<li>Print out all the nodes in the graph that are connected to the &ldquo;root nodes&rdquo; (i.e. this time round, the nodes are Kubernetes objects associated with the Helm release).</li>
+</ol>
+<p>In Helm 3, we can obtain the list of associated Kubernetes objects via the generated manifest for a given release. Getting this manifest is just a single step via the <code>helm</code> CLI tool:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ RELEASE_NAME=&#34;kube-state-metrics&#34;
+$ helm get manifest $RELEASE_NAME
+---
+# Source: kube-state-metrics/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/name: kube-state-metrics
+    helm.sh/chart: kube-state-metrics-3.5.2
+    app.kubernetes.io/managed-by: Helm
+...
+</code></pre></div><p><a href=https://helm.sh/docs/topics/advanced/#storage-backends>By default</a>, this release information is stored as a <code>Secret</code> object in the namespace of the release. With a bit of extra effort, we can also extract the same manifest via <code>kubectl</code> & a bunch of other commonly used CLI tools:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ RELEASE_SECRET_NAME=&#34;sh.helm.release.v1.kube-state-metrics.v1&#34;
+$ kubectl get secret $RELEASE_SECRET_NAME -o json \
+   | jq &#34;.data.release&#34; -r \
+   | base64 -d | base64 -d | gzip -d \
+   | jq &#34;.manifest&#34; -r
+---
+# Source: kube-state-metrics/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/name: kube-state-metrics
+    helm.sh/chart: kube-state-metrics-3.5.2
+    app.kubernetes.io/managed-by: Helm
+...
+</code></pre></div><p>Fortunately Helm has a Go package (<a href=https://pkg.go.dev/helm.sh/helm/v3/pkg/action>helm.sh/helm/v3/pkg/action</a>) to get the manifest of a release, so there wasn&rsquo;t a lot of extra effort involved on my end to implement this feature.</p>
+<p>Here&rsquo;s an example of how we can view the list of Kubernetes objects associated to a release of a <a href=https://artifacthub.io/packages/helm/prometheus-community/kube-state-metrics>kube-state-metrics</a> Helm chart:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ RELEASE_NAME=&#34;kube-state-metrics&#34;
+$ kubectl lineage helm $RELEASE_NAME --depth=1
+NAMESPACE    NAME                                                  READY   STATUS     AGE
+monitoring   kube-state-metrics                                    True    Deployed   5m
+             ├── ClusterRole/kube-state-metrics                    -                  5m
+             ├── ClusterRoleBinding/kube-state-metrics             -                  5m
+monitoring   ├── Deployment/kube-state-metrics                     1/1                5m
+monitoring   ├── Secret/sh.helm.release.v1.kube-state-metrics.v1   -                  5m
+monitoring   ├── Service/kube-state-metrics                        -                  5m
+monitoring   └── ServiceAccount/kube-state-metrics                 -                  5m
+</code></pre></div><h2 id=whats-next>What&rsquo;s next?</h2>
+<p>I&rsquo;m currently exploring the idea of discovering object relationships for custom resources from incubating or graduated CNCF projects. Some possible examples:</p>
+<ul>
+<li><code>Application</code> from <a href=https://github.com/argoproj/argo-cd>Argo CD</a></li>
+<li><code>HelmRelease</code> from <a href=https://github.com/fluxcd/helm-controller>Helm Controller</a></li>
+<li><code>ScaledObject</code>, <code>ScaledJob</code> & <code>TriggerAuthentication</code> from <a href=https://github.com/kedacore/keda>KEDA</a></li>
+</ul>
+<p>If you like to see support for certain custom resource(s) or have any feature suggestion, do feel free to create an issue on the project&rsquo;s <a href=https://github.com/tohjustin/kube-lineage/issues>GitHub issue page</a> or reach out to me on <a href=https://twitter.com/tohjustin_>Twitter</a>! I would love to get feedback on how to improve <code>kube-lineage</code>. 🙂</p>
+</div>
+<div class=post-tags>
+<nav class="nav tags">
+<ul class=flat>
+<li><a href=/tags/helm>helm</a></li>
+<li><a href=/tags/kubectl-plugin>kubectl-plugin</a></li>
+<li><a href=/tags/kubernetes>kubernetes</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<div class="footer wrapper">
+<nav class=nav>
+<div> Built with <a href=https://gohugo.io>Hugo</a></div>
+</nav>
+</div>
+<script>feather.replace()</script>
+</body>
+</html>
