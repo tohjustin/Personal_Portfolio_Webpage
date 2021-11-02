@@ -218,7 +218,7 @@ ul {
 }
 
 .highlight code {
-  padding: none;
+    padding: 0;
 }
 
 .highlight {
@@ -228,7 +228,7 @@ ul {
 }
 
 pre code {
-  display: inline-block;
+    display: inline-block;
 }
 
 .wrapper {
