@@ -94,6 +94,8 @@ blockquote em {
 
 code,kbd,pre,samp {
     font-family: "JetBrains Mono", monospace;
+    font-kerning: none;
+    font-variant-numeric: tabular-nums lining-nums;
 }
 
 code {
@@ -218,7 +220,7 @@ ul {
 }
 
 .highlight code {
-  padding: none;
+    padding: 0;
 }
 
 .highlight {
@@ -228,7 +230,7 @@ ul {
 }
 
 pre code {
-  display: inline-block;
+    display: inline-block;
 }
 
 .wrapper {

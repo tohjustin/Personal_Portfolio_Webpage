@@ -59,10 +59,10 @@ kube-system           │   └── Service/metrics-server                   -
 kube-system           │       └── EndpointSlice/metrics-server-wb2cm   -                 5m
 kube-system           └── Secret/metrics-server-token-nqw85            -                 5m
 kube-system               └── Pod/metrics-server-7b4f8b595-8m7rz       1/1     Running   5m
-</code></pre></div><p>kube-lineage is available as kubectl plugin that you can install via the <a href=https://krew.sigs.k8s.io/>krew plugin manager</a>.</p>
+</code></pre></div><p>You can install kube-lineage as a kubectl plugin that via the <a href=https://krew.sigs.k8s.io/>krew plugin manager</a>.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>kubectl krew install lineage
 </code></pre></div><h2 id=motivation>Motivation</h2>
-<p><code>kubectl</code> is the primary tool most users use to interact with their Kubernetes cluster. Since it doesn&rsquo;t have a built-in command to display related Kubernetes objects, understanding how each Kubernetes object in a cluster are related to one another isn&rsquo;t straightforward task.</p>
+<p><code>kubectl</code> is the primary tool that most users use to interact with their Kubernetes cluster. Since it doesn&rsquo;t have a built-in command to display related Kubernetes objects in a cluster, understanding how each them are related to one another isn&rsquo;t straightforward task.</p>
 <p>Just a few months ago, I discovered <a href=https://github.com/ahmetb/kubectl-tree>kubectl-tree</a> — a kubectl plugin that helps to visualize <a href=https://kubernetes.io/docs/concepts/overview/working-with-objects/owners-dependents/>object ownership</a> in a similar manner to the <a href=https://en.wikipedia.org/wiki/Tree_(command)>tree</a> command found in most operating systems.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl tree deployment traefik
 NAMESPACE    NAME                             READY  REASON  AGE
@@ -76,14 +76,14 @@ kube-system    └─Pod/traefik-5dd496474-cr6d8  True           14d
 </ul>
 <p>However I also discovered a lot of new questions that the tool wasn&rsquo;t able to answer:</p>
 <blockquote>
-<p>&ldquo;Which resources are referencing this <code>Secret</code>?&rdquo;</p>
-<p>&ldquo;Which <code>Pods</code> are using this <code>ServiceAccount</code>?&rdquo;</p>
-<p>&ldquo;Which <code>ServiceAccounts</code> are bound to this <code>ClusterRole</code>?&rdquo;</p>
-<p>&ldquo;Are there any <code>Ingresses</code> or <code>ValidatingWebhookConfigurations</code> dependent on this <code>Pod</code>?&rdquo;</p>
+<p>&ldquo;Which resources are referencing this Secret?&rdquo;</p>
+<p>&ldquo;Which Pods are using this ServiceAccount?&rdquo;</p>
+<p>&ldquo;Which ServiceAccounts are bound to this ClusterRole?&rdquo;</p>
+<p>&ldquo;Are there any Ingresses or ValidatingWebhookConfigurations dependent on this Pod?&rdquo;</p>
 </blockquote>
-<p>Some of the questions could definitely answered by other existing kubectl-plugins, but I was looking for a single tool to answer all of them (hopefully) & hence I decided to build kube-lineage.</p>
+<p>Some of the questions could definitely answered by other existing kubectl-plugins, but I was hoping for a single tool to answer all of them & hence I decided to build one myself as I could find any alternatives out there.</p>
 <h2 id=initial-research>Initial Research</h2>
-<p>Initially I tried to find out if there were any existing APIs in the Kubernetes control plane that I could use for object relationship discovery. The garbage collector controller was a promising option as it tracked the ownership of all objects in the cluster & the data is accessible via an API:</p>
+<p>I started off with finding whether there were any existing APIs in the Kubernetes control plane that I could use for object relationship discovery. The garbage collector controller was a promising candidate as it tracked the ownership of all objects in the cluster & the data is accessible via an API:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl get --raw /debug/controllers/garbagecollector/graph --server=$KUBE_CONTROLLER_MANAGER
 strict digraph full {
   // Node definitions.
@@ -120,8 +120,8 @@ strict digraph full {
 <blockquote>
 <p>&ldquo;What are the list of resources associated to a specific Helm release?&rdquo;</p>
 </blockquote>
-<p>Since a <a href=https://helm.sh/docs/glossary/#release>Helm release</a> isn&rsquo;t an actual Kubernetes resource but a construct that exists only in Helm, we needed a new input format or flag to specify a Helm release instead of a Kubernetes object for our tool.</p>
-<p>One of the design goal that I had from the start was intentionally make the input formats & flags as similar to <code>kubectl get</code> as possible to reduce the initial learning curve for users. To avoid introducing a new input format or flag(s) to the existing command, a separate <code>helm</code> subcommand was created for this feature instead.</p>
+<p>Since a <a href=https://helm.sh/docs/glossary/#release>Helm release</a> isn&rsquo;t an actual Kubernetes resource but a construct that exists only in Helm, we needed either a new input format or flag for our command to specify a Helm release instead of a Kubernetes object.</p>
+<p>One of the design goal that I had from the start was to reduce the initial learning curve for users, hence I intentionally made the input formats & flags of the command as similar to <code>kubectl get</code> as possible to. To avoid overloading the existing command with a new input format or flag(s), a separate <code>helm</code> subcommand was created for this feature instead.</p>
 <p>The <code>helm</code> subcommand uses a rather similar implementation:</p>
 <ol>
 <li>List all Kubernetes objects associated with the specified Helm release.</li>
@@ -130,7 +130,11 @@ strict digraph full {
 <li>For each object, scan through its fields & construct a relationship graph.</li>
 <li>Print out all the nodes in the graph that are connected to the &ldquo;root nodes&rdquo; (i.e. this time round, the nodes are Kubernetes objects associated with the Helm release).</li>
 </ol>
-<p>In Helm 3, we can obtain the list of associated Kubernetes objects via the generated manifest for a given release. Getting this manifest is just a single step via the <code>helm</code> CLI tool:</p>
+<p>In Helm 3, we can obtain the list of associated Kubernetes objects via the generated manifest for a given release. For those that aren&rsquo;t familiar with Helm terminology:</p>
+<blockquote>
+<p>A <a href=https://helm.sh/docs/helm/helm_get_manifest/>manifest</a> is a YAML-encoded representation of the Kubernetes resources that were generated from a release&rsquo;s chart(s). If a chart is dependent on other charts, those resources will also be included in the manifest.</p>
+</blockquote>
+<p>Getting the manifest of release is just a single step via the <code>helm</code> CLI tool:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ RELEASE_NAME=&#34;kube-state-metrics&#34;
 $ helm get manifest $RELEASE_NAME
 ---
@@ -143,7 +147,7 @@ metadata:
     helm.sh/chart: kube-state-metrics-3.5.2
     app.kubernetes.io/managed-by: Helm
 ...
-</code></pre></div><p><a href=https://helm.sh/docs/topics/advanced/#storage-backends>By default</a>, this release information is stored as a <code>Secret</code> object in the namespace of the release. With a bit of extra effort, we can also extract the same manifest via <code>kubectl</code> & a bunch of other commonly used CLI tools:</p>
+</code></pre></div><p><a href=https://helm.sh/docs/topics/advanced/#storage-backends>By default</a>, this release information is stored as a <code>Secret</code> object in the namespace of the release. With a bit of extra effort, we can also extract the manifest via <code>kubectl</code> & a few other commonly used CLI tools:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ RELEASE_SECRET_NAME=&#34;sh.helm.release.v1.kube-state-metrics.v1&#34;
 $ kubectl get secret $RELEASE_SECRET_NAME -o json \
    | jq &#34;.data.release&#34; -r \
@@ -159,8 +163,8 @@ metadata:
     helm.sh/chart: kube-state-metrics-3.5.2
     app.kubernetes.io/managed-by: Helm
 ...
-</code></pre></div><p>Fortunately Helm has a Go package (<a href=https://pkg.go.dev/helm.sh/helm/v3/pkg/action>helm.sh/helm/v3/pkg/action</a>) to get the manifest of a release, so there wasn&rsquo;t a lot of extra effort involved on my end to implement this feature.</p>
-<p>Here&rsquo;s an example of how we can view the list of Kubernetes objects associated to a release of a <a href=https://artifacthub.io/packages/helm/prometheus-community/kube-state-metrics>kube-state-metrics</a> Helm chart:</p>
+</code></pre></div><p>Fortunately Helm has a Go package (<a href=https://pkg.go.dev/helm.sh/helm/v3/pkg/action>helm.sh/helm/v3/pkg/action</a>) to obtain the manifest of a specific release, so there wasn&rsquo;t a lot of extra effort involved on my end to implement this portion of the feature.</p>
+<p>Finally here&rsquo;s how we can use <code>kubectl lineage helm</code> to view the list of Kubernetes objects associated to a release of a <a href=https://artifacthub.io/packages/helm/prometheus-community/kube-state-metrics>kube-state-metrics</a> Helm chart:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ RELEASE_NAME=&#34;kube-state-metrics&#34;
 $ kubectl lineage helm $RELEASE_NAME --depth=1
 NAMESPACE    NAME                                                  READY   STATUS     AGE
@@ -172,18 +176,19 @@ monitoring   ├── Secret/sh.helm.release.v1.kube-state-metrics.v1   -      
 monitoring   ├── Service/kube-state-metrics                        -                  5m
 monitoring   └── ServiceAccount/kube-state-metrics                 -                  5m
 </code></pre></div><h2 id=whats-next>What&rsquo;s next?</h2>
-<p>I&rsquo;m currently exploring the idea of discovering object relationships for custom resources from incubating or graduated CNCF projects. Some possible examples:</p>
+<p>I&rsquo;m currently exploring the idea of going beyond native Kubernetes resources by discovering object relationships for custom resources from incubating or graduated CNCF projects. Some possible examples:</p>
 <ul>
-<li><code>Application</code> from <a href=https://github.com/argoproj/argo-cd>Argo CD</a></li>
-<li><code>HelmRelease</code> from <a href=https://github.com/fluxcd/helm-controller>Helm Controller</a></li>
-<li><code>ScaledObject</code>, <code>ScaledJob</code> & <code>TriggerAuthentication</code> from <a href=https://github.com/kedacore/keda>KEDA</a></li>
+<li><code>Application</code> from <a href=https://www.cncf.io/projects/argo/>Argo</a>&rsquo;s <a href=https://github.com/argoproj/argo-cd>Argo CD</a>.</li>
+<li><code>HelmRelease</code> from <a href=https://fluxcd.io/>Flux</a>&rsquo;s <a href=https://github.com/fluxcd/helm-controller>Helm Controller</a>.</li>
+<li><code>ScaledObject</code>, <code>ScaledJob</code> & <code>TriggerAuthentication</code> from <a href=https://keda.sh/>KEDA</a>.</li>
 </ul>
-<p>If you like to see support for certain custom resource(s) or have any feature suggestion, do feel free to create an issue on the project&rsquo;s <a href=https://github.com/tohjustin/kube-lineage/issues>GitHub issue page</a> or reach out to me on <a href=https://twitter.com/tohjustin_>Twitter</a>! I would love to get feedback on how to improve <code>kube-lineage</code>. 🙂</p>
+<p>I would love to get feedback on how to improve <code>kube-lineage</code>. If you have any feature suggestion or like to see support for certain custom resource(s), do feel free to create an issue on the project&rsquo;s <a href=https://github.com/tohjustin/kube-lineage/issues>GitHub issue page</a> or reach out to me on <a href=https://twitter.com/tohjustin_>Twitter</a>! 🙂</p>
 </div>
 <div class=post-tags>
 <nav class="nav tags">
 <ul class=flat>
 <li><a href=/tags/helm>helm</a></li>
+<li><a href=/tags/kube-lineage>kube-lineage</a></li>
 <li><a href=/tags/kubectl-plugin>kubectl-plugin</a></li>
 <li><a href=/tags/kubernetes>kubernetes</a></li>
 </ul>
