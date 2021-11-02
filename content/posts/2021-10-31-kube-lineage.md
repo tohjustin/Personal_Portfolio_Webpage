@@ -2,7 +2,7 @@
 title: "kube-lineage: A CLI tool for visualizing Kubernetes object relationships"
 description: "kube-lineage is a CLI tool that allows users to view all dependents or dependencies of a given Kubernetes object so that they can better understand how objects in a cluster are related to each other."
 date: 2021-11-01T21:00:00+08:00
-tags: [helm, kubectl-plugin, kubernetes]
+tags: [helm, kube-lineage, kubectl-plugin, kubernetes]
 ---
 
 [kube-lineage](https://github.com/tohjustin/kube-lineage) is a CLI tool for visualizing Kubernetes object relationships. It allows users to view all dependents or dependencies of a given Kubernetes object so that they can better understand how objects in a cluster are related to each other.
@@ -21,7 +21,7 @@ kube-system           └── Secret/metrics-server-token-nqw85            -  
 kube-system               └── Pod/metrics-server-7b4f8b595-8m7rz       1/1     Running   5m
 ```
 
-kube-lineage is available as kubectl plugin that you can install via the [krew plugin manager](https://krew.sigs.k8s.io/).
+You can install kube-lineage as a kubectl plugin that via the [krew plugin manager](https://krew.sigs.k8s.io/).
 
 ```text
 kubectl krew install lineage
@@ -29,7 +29,7 @@ kubectl krew install lineage
 
 ## Motivation
 
-`kubectl` is the primary tool most users use to interact with their Kubernetes cluster. Since it doesn't have a built-in command to display related Kubernetes objects, understanding how each Kubernetes object in a cluster are related to one another isn't straightforward task.
+`kubectl` is the primary tool that most users use to interact with their Kubernetes cluster. Since it doesn't have a built-in command to display related Kubernetes objects in a cluster, understanding how each them are related to one another isn't straightforward task.
 
 Just a few months ago, I discovered [kubectl-tree](https://github.com/ahmetb/kubectl-tree) — a kubectl plugin that helps to visualize [object ownership](https://kubernetes.io/docs/concepts/overview/working-with-objects/owners-dependents/) in a similar manner to the [tree](https://en.wikipedia.org/wiki/Tree_(command)) command found in most operating systems.
 
@@ -48,19 +48,19 @@ It allows users to view all the dependents of a given Kubernetes object with a s
 
 However I also discovered a lot of new questions that the tool wasn't able to answer:
 
-> "Which resources are referencing this `Secret`?"
+> "Which resources are referencing this Secret?"
 >
-> "Which `Pods` are using this `ServiceAccount`?"
+> "Which Pods are using this ServiceAccount?"
 >
-> "Which `ServiceAccounts` are bound to this `ClusterRole`?"
+> "Which ServiceAccounts are bound to this ClusterRole?"
 >
-> "Are there any `Ingresses` or `ValidatingWebhookConfigurations` dependent on this `Pod`?"
+> "Are there any Ingresses or ValidatingWebhookConfigurations dependent on this Pod?"
 
-Some of the questions could definitely answered by other existing kubectl-plugins, but I was looking for a single tool to answer all of them (hopefully) & hence I decided to build kube-lineage.
+Some of the questions could definitely answered by other existing kubectl-plugins, but I was hoping for a single tool to answer all of them & hence I decided to build one myself as I could find any alternatives out there.
 
 ## Initial Research
 
-Initially I tried to find out if there were any existing APIs in the Kubernetes control plane that I could use for object relationship discovery. The garbage collector controller was a promising option as it tracked the ownership of all objects in the cluster & the data is accessible via an API:
+I started off with finding whether there were any existing APIs in the Kubernetes control plane that I could use for object relationship discovery. The garbage collector controller was a promising candidate as it tracked the ownership of all objects in the cluster & the data is accessible via an API:
 
 ```text
 $ kubectl get --raw /debug/controllers/garbagecollector/graph --server=$KUBE_CONTROLLER_MANAGER
@@ -103,9 +103,9 @@ Now that we have the ability to visualize object relationships in the cluster, I
 
 > "What are the list of resources associated to a specific Helm release?"
 
-Since a [Helm release](https://helm.sh/docs/glossary/#release) isn't an actual Kubernetes resource but a construct that exists only in Helm, we needed a new input format or flag to specify a Helm release instead of a Kubernetes object for our tool.
+Since a [Helm release](https://helm.sh/docs/glossary/#release) isn't an actual Kubernetes resource but a construct that exists only in Helm, we needed either a new input format or flag for our command to specify a Helm release instead of a Kubernetes object.
 
-One of the design goal that I had from the start was intentionally make the input formats & flags as similar to `kubectl get` as possible to reduce the initial learning curve for users. To avoid introducing a new input format or flag(s) to the existing command, a separate `helm` subcommand was created for this feature instead.
+One of the design goal that I had from the start was to reduce the initial learning curve for users, hence I intentionally made the input formats & flags of the command as similar to `kubectl get` as possible to. To avoid overloading the existing command with a new input format or flag(s), a separate `helm` subcommand was created for this feature instead.
 
 The `helm` subcommand uses a rather similar implementation:
 
@@ -115,7 +115,11 @@ The `helm` subcommand uses a rather similar implementation:
 4. For each object, scan through its fields & construct a relationship graph.
 5. Print out all the nodes in the graph that are connected to the "root nodes" (i.e. this time round, the nodes are Kubernetes objects associated with the Helm release).
 
-In Helm 3, we can obtain the list of associated Kubernetes objects via the generated manifest for a given release. Getting this manifest is just a single step via the `helm` CLI tool:
+In Helm 3, we can obtain the list of associated Kubernetes objects via the generated manifest for a given release. For those that aren't familiar with Helm terminology:
+
+> A [manifest](https://helm.sh/docs/helm/helm_get_manifest/) is a YAML-encoded representation of the Kubernetes resources that were generated from a release's chart(s). If a chart is dependent on other charts, those resources will also be included in the manifest.
+
+Getting the manifest of release is just a single step via the `helm` CLI tool:
 
 ```text
 $ RELEASE_NAME="kube-state-metrics"
@@ -132,7 +136,7 @@ metadata:
 ...
 ```
 
-[By default](https://helm.sh/docs/topics/advanced/#storage-backends), this release information is stored as a `Secret` object in the namespace of the release. With a bit of extra effort, we can also extract the same manifest via `kubectl` & a bunch of other commonly used CLI tools:
+[By default](https://helm.sh/docs/topics/advanced/#storage-backends), this release information is stored as a `Secret` object in the namespace of the release. With a bit of extra effort, we can also extract the manifest via `kubectl` & a few other commonly used CLI tools:
 
 ```text
 $ RELEASE_SECRET_NAME="sh.helm.release.v1.kube-state-metrics.v1"
@@ -152,9 +156,9 @@ metadata:
 ...
 ```
 
-Fortunately Helm has a Go package ([helm.sh/helm/v3/pkg/action](https://pkg.go.dev/helm.sh/helm/v3/pkg/action)) to get the manifest of a release, so there wasn't a lot of extra effort involved on my end to implement this feature.
+Fortunately Helm has a Go package ([helm.sh/helm/v3/pkg/action](https://pkg.go.dev/helm.sh/helm/v3/pkg/action)) to obtain the manifest of a specific release, so there wasn't a lot of extra effort involved on my end to implement this portion of the feature.
 
-Here's an example of how we can view the list of Kubernetes objects associated to a release of a [kube-state-metrics](https://artifacthub.io/packages/helm/prometheus-community/kube-state-metrics) Helm chart:
+Finally here's how we can use `kubectl lineage helm` to view the list of Kubernetes objects associated to a release of a [kube-state-metrics](https://artifacthub.io/packages/helm/prometheus-community/kube-state-metrics) Helm chart:
 
 ```text
 $ RELEASE_NAME="kube-state-metrics"
@@ -171,10 +175,10 @@ monitoring   └── ServiceAccount/kube-state-metrics                 -      
 
 ## What's next?
 
-I'm currently exploring the idea of discovering object relationships for custom resources from incubating or graduated CNCF projects. Some possible examples:
+I'm currently exploring the idea of going beyond native Kubernetes resources by discovering object relationships for custom resources from incubating or graduated CNCF projects. Some possible examples:
 
-- `Application` from [Argo CD](https://github.com/argoproj/argo-cd)
-- `HelmRelease` from [Helm Controller](https://github.com/fluxcd/helm-controller)
-- `ScaledObject`, `ScaledJob` & `TriggerAuthentication` from [KEDA](https://github.com/kedacore/keda)
+- `Application` from [Argo](https://www.cncf.io/projects/argo/)'s [Argo CD](https://github.com/argoproj/argo-cd).
+- `HelmRelease` from [Flux](https://fluxcd.io/)'s [Helm Controller](https://github.com/fluxcd/helm-controller).
+- `ScaledObject`, `ScaledJob` & `TriggerAuthentication` from [KEDA](https://keda.sh/).
 
-If you like to see support for certain custom resource(s) or have any feature suggestion, do feel free to create an issue on the project's [GitHub issue page](https://github.com/tohjustin/kube-lineage/issues) or reach out to me on [Twitter](https://twitter.com/tohjustin_)! I would love to get feedback on how to improve `kube-lineage`. 🙂
+I would love to get feedback on how to improve `kube-lineage`. If you have any feature suggestion or like to see support for certain custom resource(s), do feel free to create an issue on the project's [GitHub issue page](https://github.com/tohjustin/kube-lineage/issues) or reach out to me on [Twitter](https://twitter.com/tohjustin_)! 🙂
