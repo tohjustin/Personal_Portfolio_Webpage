@@ -94,6 +94,8 @@ blockquote em {
 
 code,kbd,pre,samp {
     font-family: "JetBrains Mono", monospace;
+    font-kerning: none;
+    font-variant-numeric: tabular-nums lining-nums;
 }
 
 code {
