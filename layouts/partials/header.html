@@ -51,4 +51,11 @@
 	{{- end }}
 	{{- end }}
 	{{- end }}
+
+	<!-- Plausible Analytics -->
+	{{ if .Site.Params.plausible.enable }}
+	{{ with .Site.Params.plausible.domain }}
+	<script defer data-domain="{{ . }}" src="https://plausible.io/js/plausible.js"></script>
+	{{ end }}
+	{{ end }}
 </head>

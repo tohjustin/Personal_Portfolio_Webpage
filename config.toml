@@ -54,6 +54,11 @@ favicon = "icons/favicon.png"
 # for example you may want to include external JS library.
 # customJS = ["js/abc.js", "js/xyz.js", "https://code.jquery.com/jquery-3.4.1.js"]
 
+# plausible analytics: see https://plausible.io/
+[params.plausible]
+enable = true
+domain = "tohjustin.github.io"
+
 # Social media links which shows up on site header.
 # Uses feather icons for icons. You can [search icon names from here](https://feathericons.com/).
 [[params.social]]
