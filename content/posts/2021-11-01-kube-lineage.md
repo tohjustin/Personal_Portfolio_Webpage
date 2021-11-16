@@ -2,7 +2,7 @@
 title: "kube-lineage: A CLI tool for visualizing Kubernetes object relationships"
 description: "kube-lineage is a CLI tool that allows users to view all dependents or dependencies of a given Kubernetes object so that they can better understand how objects in a cluster are related to each other."
 date: 2021-11-01T21:00:00+08:00
-tags: [helm, kube-lineage, kubectl-plugin, kubernetes]
+tags: [helm, kubectl-plugin, kubernetes]
 ---
 
 [kube-lineage](https://github.com/tohjustin/kube-lineage) is a CLI tool for visualizing Kubernetes object relationships. It allows users to view all dependents or dependencies of a given Kubernetes object so that they can better understand how objects in a cluster are related to each other.
@@ -21,7 +21,7 @@ kube-system           └── Secret/metrics-server-token-nqw85            -  
 kube-system               └── Pod/metrics-server-7b4f8b595-8m7rz       1/1     Running   5m
 ```
 
-You can install kube-lineage as a kubectl plugin that via the [krew plugin manager](https://krew.sigs.k8s.io/).
+You can install kube-lineage as a kubectl plugin using the [krew plugin manager](https://krew.sigs.k8s.io/).
 
 ```text
 kubectl krew install lineage
