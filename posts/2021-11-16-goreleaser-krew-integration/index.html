@@ -49,16 +49,16 @@
 </div>
 <div class=markdown>
 <p><a href=https://carlosbecker.com/posts/goreleaser-v1/>GoReleaser v1.0.0</a> was just released this week & I wanted to try out their new <a href=https://goreleaser.com/customization/krew/>Krew integration</a> to see if I can use it in my GitHub Actions workflow to publish new versions of my kubectl plugins to the <a href=https://github.com/kubernetes-sigs/krew-index>official krew index</a>. Unfortunately it only works with <a href=https://krew.sigs.k8s.io/docs/user-guide/custom-indexes>custom plugin indexes</a>, so we still have to stick with the <a href=https://github.com/rajatjindal/krew-release-bot>rajatjindal/krew-release-bot</a> GitHub action. 😭</p>
-<p>However I always wanted to try hosting a custom plugin index, so this finally gave me enough incentive to commit into doing it & share the process of how you would use GoReleaser to publish kubectl plugin to a custom plugin index.</p>
+<p>However I always wanted to try hosting a custom plugin index, so this finally gave me enough incentive to commit into doing it & share the process of how we would use GoReleaser to publish kubectl plugin to a custom plugin index.</p>
 <blockquote>
 <p>A <a href=https://krew.sigs.k8s.io/docs/developer-guide/plugin-manifest/>Krew plugin manifest</a> is a YAML file that describes the plugin, how it can be downloaded, and how it is installed on a machine.</p>
 </blockquote>
 <h2 id=hosting-a-custom-plugin-index>Hosting a custom plugin index</h2>
 <p>A custom plugin index is essentially a Git repository that follows a certain directory structure & contains a bunch of Krew plugin manifests.</p>
-<p>You can refer to the Krew docs on <a href=https://krew.sigs.k8s.io/docs/developer-guide/custom-indexes/>&ldquo;Hosting Custom Plugin Indexes&rdquo;</a> for details on how to host one.</p>
+<p>We can refer to the Krew docs on <a href=https://krew.sigs.k8s.io/docs/developer-guide/custom-indexes/>&ldquo;Hosting Custom Plugin Indexes&rdquo;</a> for details on how to host one.</p>
 <h2 id=obtaining-a-github-personal-access-token>Obtaining a GitHub Personal Access Token</h2>
-<p>In order for GoReleaser to push changes to your custom plugin index (a GitHub repository) via the GitHub API, we need to prepare a Personal Access Token (PAT) with <code>repo</code> permissions.</p>
-<p>You can refer to the GitHub docs on <a href=https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token>&ldquo;Creating a personal access token&rdquo;</a> on how to do this.</p>
+<p>In order for GoReleaser to push changes to our custom plugin index (a GitHub repository) via the GitHub API, we need to prepare a Personal Access Token (PAT) with <code>repo</code> permissions.</p>
+<p>We can refer to the GitHub docs on <a href=https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token>&ldquo;Creating a personal access token&rdquo;</a> on how to do this.</p>
 <p>To be honest, I&rsquo;m not too thrilled with doing this with PATs as it grants GoReleaser access to all my repos when all I need is to only grant it commit access to the <a href=https://github.com/tohjustin/kubectl-plugins>tohjustin/kubectl-plugins</a> repository. At least based on the <a href=https://github.com/goreleaser/goreleaser/issues/2027#issuecomment-778330276>project owner&rsquo;s response in this GitHub issue</a>, it seems like he is open to looking into using <a href=https://docs.github.com/en/developers/overview/managing-deploy-keys#deploy-keys>deploy keys</a> to address this issue for GoReleaser v2. 😅</p>
 <h2 id=converting-a-krew-plugin-manifest-to-goreleaser-configuration>Converting a Krew plugin manifest to GoReleaser configuration</h2>
 <p>Since pretty much all folks who has published a kubectl plugin to the official Krew index are familiar with what a Krew plugin manifest is, I thought it would be more interesting to do this backwards by converting an existing manifest into a GoReleaser configuration instead of writing one from scratch.</p>
@@ -87,7 +87,7 @@
     <span style=color:#f92672>sha256</span>: <span style=color:#e6db74>&#34;75dd85e8f91a84e37a0e36f00697e6cadb864143b825f808ff540a2b93a2612b&#34;</span>
     <span style=color:#f92672>bin</span>: <span style=color:#e6db74>&#34;kube-lineage&#34;</span>
 <span style=color:#75715e># ...</span>
-</code></pre></div><p>First we use this manifest template that we derive by replacing values we need to copy over to the GoReleaser configuration over with template variables (<code>$PLUGIN_NAME</code>, <code>$HOME_PAGE</code> etc.):</p>
+</code></pre></div><p>First we use the manifest template below that we derive by replacing those values that we need to copy over to the GoReleaser configuration with template variables (<code>$PLUGIN_NAME</code>, <code>$HOME_PAGE</code> etc.):</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#e6db74>&#34;krew.googlecontainertools.github.com/v1alpha2&#34;</span>
 <span style=color:#f92672>kind</span>: <span style=color:#e6db74>&#34;Plugin&#34;</span>
 <span style=color:#f92672>metadata</span>:
@@ -106,7 +106,7 @@
     <span style=color:#f92672>sha256</span>: <span style=color:#e6db74>&#34;75dd85e8f91a84e37a0e36f00697e6cadb864143b825f808ff540a2b93a2612b&#34;</span>
     <span style=color:#f92672>bin</span>: <span style=color:#e6db74>&#34;kube-lineage&#34;</span>
 <span style=color:#75715e># ...</span>
-</code></pre></div><p>Then in our GoReleaser configuration file, we copy the values from the original manifest based on this template below:</p>
+</code></pre></div><p>Then based on the configuration template below, we copy the values from the original manifest to our GoReleaser configuration file:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#75715e># .goreleaser.yaml</span>
 <span style=color:#f92672>krews</span>:
   - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>$PLUGIN_NAME</span>
@@ -140,11 +140,11 @@
     <span style=color:#f92672>caveats</span>: |<span style=color:#e6db74>
 </span><span style=color:#e6db74>      The tool only shows dependencies or dependents among the resources you have
 </span><span style=color:#e6db74>      access to. So for restricted users, the result may be incomplete.</span>      
-</code></pre></div><p>There&rsquo;s a lot other available options that you can configure for this Krew integration, you can refer to the <a href=https://goreleaser.com/customization/krew/>official GoReleaser docs</a> to find out more about them! 🙂</p>
+</code></pre></div><p>There are a lot other available options that we can configure for this Krew integration, we can refer to the <a href=https://goreleaser.com/customization/krew/>official GoReleaser docs</a> to find out more about them! 🙂</p>
 <h2 id=configuring-github-actions-workflow>Configuring GitHub Actions workflow</h2>
 <p>I have automated the publishing of kubectl plugins with GoReleaser via a GitHub Actions workflow, so we need to add the PAT obtained in the <a href=/posts/2021-11-16-goreleaser-krew-integration/#obtaining-a-github-personal-access-token>earlier step</a> as a secret in our repository. We can do this on GitHub via the repository&rsquo;s <strong>Settings</strong> page under the <strong>Secrets</strong> section:</p>
 <p><img src=/images/2021-11-15-repository-secret.png alt=repository-secret-page-on-github></p>
-<p>You can see from the image above that I&rsquo;ve set the token as a secret named <code>KREW_GITHUB_TOKEN</code> which was referenced this in our <a href=https://github.com/tohjustin/kube-lineage/blob/v0.4.2/.goreleaser.yaml#L54-L70>GoReleaser configuration</a> earlier on.</p>
+<p>We can see from the image above that I&rsquo;ve set the token as a secret named <code>KREW_GITHUB_TOKEN</code> which was referenced in our <a href=https://github.com/tohjustin/kube-lineage/blob/v0.4.2/.goreleaser.yaml#L54-L70>GoReleaser configuration</a> earlier on.</p>
 <p>Next we need to update our <a href=https://github.com/tohjustin/kube-lineage/blob/v0.4.2/.github/workflows/release.yaml#L66-L70>GitHub Actions workflow definition</a> to set the <code>KREW_GITHUB_TOKEN</code> environment variable so that GoReleaser can access it:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#75715e># https://github.com/tohjustin/kube-lineage/blob/v0.4.2/.github/workflows/release.yaml#L66-L70</span>
 <span style=color:#75715e># ...</span>
@@ -155,7 +155,7 @@
           <span style=color:#f92672>KREW_GITHUB_TOKEN</span>: <span style=color:#ae81ff>${{ secrets.KREW_GITHUB_TOKEN }}</span>
 <span style=color:#75715e># ...</span>
 </code></pre></div><p>Finally our GoReleaser configuration is ready to publish our Krew plugin manifest to a custom plugin index!</p>
-<p>Here&rsquo;s an example of the Git commit that GoReleaser created in <a href=https://github.com/tohjustin/kubectl-plugins>tohjustin/kubectl-plugins</a> (my custom plugin index) after a successful workflow run:</p>
+<p>After a successful workflow run, we should see a Git commit created by GoReleaser in the repository of the custom plugin index:</p>
 <p><img src=/images/2021-11-15-goreleaser-commit.png alt=git-commit-created-by-goreleaser></p>
 </div>
 <div class=post-tags>
