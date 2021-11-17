@@ -7,7 +7,7 @@ tags: [goreleaser, kubectl-plugin, kubernetes]
 
 [GoReleaser v1.0.0](https://carlosbecker.com/posts/goreleaser-v1/) was just released this week & I wanted to try out their new [Krew integration](https://goreleaser.com/customization/krew/) to see if I can use it in my GitHub Actions workflow to publish new versions of my kubectl plugins to the [official krew index](https://github.com/kubernetes-sigs/krew-index). Unfortunately it only works with [custom plugin indexes](https://krew.sigs.k8s.io/docs/user-guide/custom-indexes), so we still have to stick with the [rajatjindal/krew-release-bot](https://github.com/rajatjindal/krew-release-bot) GitHub action. 😭
 
-However I always wanted to try hosting a custom plugin index, so this finally gave me enough incentive to commit into doing it & share the process of how you would use GoReleaser to publish kubectl plugin to a custom plugin index.
+However I always wanted to try hosting a custom plugin index, so this finally gave me enough incentive to commit into doing it & share the process of how we would use GoReleaser to publish kubectl plugin to a custom plugin index.
 
 > A [Krew plugin manifest](https://krew.sigs.k8s.io/docs/developer-guide/plugin-manifest/) is a YAML file that describes the plugin, how it can be downloaded, and how it is installed on a machine.
 
@@ -15,13 +15,13 @@ However I always wanted to try hosting a custom plugin index, so this finally ga
 
 A custom plugin index is essentially a Git repository that follows a certain directory structure & contains a bunch of Krew plugin manifests.
 
-You can refer to the Krew docs on ["Hosting Custom Plugin Indexes"](https://krew.sigs.k8s.io/docs/developer-guide/custom-indexes/) for details on how to host one.
+We can refer to the Krew docs on ["Hosting Custom Plugin Indexes"](https://krew.sigs.k8s.io/docs/developer-guide/custom-indexes/) for details on how to host one.
 
 ## Obtaining a GitHub Personal Access Token {id="obtaining-a-github-personal-access-token"}
 
-In order for GoReleaser to push changes to your custom plugin index (a GitHub repository) via the GitHub API, we need to prepare a Personal Access Token (PAT) with `repo` permissions.
+In order for GoReleaser to push changes to our custom plugin index (a GitHub repository) via the GitHub API, we need to prepare a Personal Access Token (PAT) with `repo` permissions.
 
-You can refer to the GitHub docs on ["Creating a personal access token"](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) on how to do this.
+We can refer to the GitHub docs on ["Creating a personal access token"](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) on how to do this.
 
 To be honest, I'm not too thrilled with doing this with PATs as it grants GoReleaser access to all my repos when all I need is to only grant it commit access to the [tohjustin/kubectl-plugins](https://github.com/tohjustin/kubectl-plugins) repository. At least based on the [project owner's response in this GitHub issue](https://github.com/goreleaser/goreleaser/issues/2027#issuecomment-778330276), it seems like he is open to looking into using [deploy keys](https://docs.github.com/en/developers/overview/managing-deploy-keys#deploy-keys) to address this issue for GoReleaser v2. 😅
 
@@ -58,7 +58,7 @@ spec:
 # ...
 ```
 
-First we use this manifest template that we derive by replacing values we need to copy over to the GoReleaser configuration over with template variables (`$PLUGIN_NAME`, `$HOME_PAGE` etc.):
+First we use the manifest template below that we derive by replacing those values that we need to copy over to the GoReleaser configuration with template variables (`$PLUGIN_NAME`, `$HOME_PAGE` etc.):
 
 ```yaml
 apiVersion: "krew.googlecontainertools.github.com/v1alpha2"
@@ -81,7 +81,7 @@ spec:
 # ...
 ```
 
-Then in our GoReleaser configuration file, we copy the values from the original manifest based on this template below:
+Then based on the configuration template below, we copy the values from the original manifest to our GoReleaser configuration file:
 
 ```yaml
 # .goreleaser.yaml
@@ -123,7 +123,7 @@ krews:
       access to. So for restricted users, the result may be incomplete.
 ```
 
-There's a lot other available options that you can configure for this Krew integration, you can refer to the [official GoReleaser docs](https://goreleaser.com/customization/krew/) to find out more about them! 🙂
+There are a lot other available options that we can configure for this Krew integration, we can refer to the [official GoReleaser docs](https://goreleaser.com/customization/krew/) to find out more about them! 🙂
 
 ## Configuring GitHub Actions workflow
 
@@ -131,7 +131,7 @@ I have automated the publishing of kubectl plugins with GoReleaser via a GitHub 
 
 ![repository-secret-page-on-github](/images/2021-11-15-repository-secret.png)
 
-You can see from the image above that I've set the token as a secret named `KREW_GITHUB_TOKEN` which was referenced this in our [GoReleaser configuration](https://github.com/tohjustin/kube-lineage/blob/v0.4.2/.goreleaser.yaml#L54-L70) earlier on.
+We can see from the image above that I've set the token as a secret named `KREW_GITHUB_TOKEN` which was referenced in our [GoReleaser configuration](https://github.com/tohjustin/kube-lineage/blob/v0.4.2/.goreleaser.yaml#L54-L70) earlier on.
 
 Next we need to update our [GitHub Actions workflow definition](https://github.com/tohjustin/kube-lineage/blob/v0.4.2/.github/workflows/release.yaml#L66-L70) to set the `KREW_GITHUB_TOKEN` environment variable so that GoReleaser can access it:
 
@@ -148,6 +148,6 @@ Next we need to update our [GitHub Actions workflow definition](https://github.c
 
 Finally our GoReleaser configuration is ready to publish our Krew plugin manifest to a custom plugin index!
 
-Here's an example of the Git commit that GoReleaser created in [tohjustin/kubectl-plugins](https://github.com/tohjustin/kubectl-plugins) (my custom plugin index) after a successful workflow run:
+After a successful workflow run, we should see a Git commit created by GoReleaser in the repository of the custom plugin index:
 
 ![git-commit-created-by-goreleaser](/images/2021-11-15-goreleaser-commit.png)
