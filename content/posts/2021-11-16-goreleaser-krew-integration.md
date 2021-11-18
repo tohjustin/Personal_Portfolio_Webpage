@@ -5,15 +5,17 @@ date: 2021-11-16T17:30:00+08:00
 tags: [goreleaser, kubectl-plugin, kubernetes]
 ---
 
-[GoReleaser v1.0.0](https://carlosbecker.com/posts/goreleaser-v1/) was just released this week & I wanted to try out their new [Krew integration](https://goreleaser.com/customization/krew/) to see if I can use it in my GitHub Actions workflow to publish new versions of my kubectl plugins to the [official krew index](https://github.com/kubernetes-sigs/krew-index). Unfortunately it only works with [custom plugin indexes](https://krew.sigs.k8s.io/docs/user-guide/custom-indexes), so we still have to stick with the [rajatjindal/krew-release-bot](https://github.com/rajatjindal/krew-release-bot) GitHub action. 😭
+[GoReleaser v1.0.0](https://carlosbecker.com/posts/goreleaser-v1/) was just released this week & I wanted to try out their new [Krew integration](https://goreleaser.com/customization/krew/) to see if I can use it in my GitHub Actions workflow to publish new versions of my kubectl plugins to the [official Krew index](https://github.com/kubernetes-sigs/krew-index).
 
-However I always wanted to try hosting a custom plugin index, so this finally gave me enough incentive to commit into doing it & share the process of how we would use GoReleaser to publish kubectl plugin to a custom plugin index.
+Unfortunately this integration only works for publishing to [custom plugin indexes](https://krew.sigs.k8s.io/docs/user-guide/custom-indexes), so we still have to stick with the [rajatjindal/krew-release-bot](https://github.com/rajatjindal/krew-release-bot) GitHub action for now.[^1] 😭
 
-> A [Krew plugin manifest](https://krew.sigs.k8s.io/docs/developer-guide/plugin-manifest/) is a YAML file that describes the plugin, how it can be downloaded, and how it is installed on a machine.
+However I always wanted to try hosting a custom plugin index, so this finally gave me enough incentive to commit into doing it & share the process of how one would use GoReleaser to publish kubectl plugins to a custom plugin index.
 
 ## Hosting a custom plugin index
 
 A custom plugin index is essentially a Git repository that follows a certain directory structure & contains a bunch of Krew plugin manifests.
+
+> A [Krew plugin manifest](https://krew.sigs.k8s.io/docs/developer-guide/plugin-manifest/) is a YAML file that describes the plugin, how it can be downloaded, and how it is installed on a machine.
 
 We can refer to the Krew docs on ["Hosting Custom Plugin Indexes"](https://krew.sigs.k8s.io/docs/developer-guide/custom-indexes/) for details on how to host one.
 
@@ -151,3 +153,5 @@ Finally our GoReleaser configuration is ready to publish our Krew plugin manifes
 After a successful workflow run, we should see a Git commit created by GoReleaser in the repository of the custom plugin index:
 
 ![git-commit-created-by-goreleaser](/images/2021-11-15-goreleaser-commit.png)
+
+[^1]: GoReleaser publishes Krew plugin manifests by pushing Git commits directly to the plugin index's Git repository, this doesn't work for the official Krew index as the established process requires the publishing to be [done via GitHub pull requests](https://krew.sigs.k8s.io/docs/developer-guide/release/updating-plugins/) for review & approval purposes.
