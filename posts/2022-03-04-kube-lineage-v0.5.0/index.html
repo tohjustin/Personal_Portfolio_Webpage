@@ -1,0 +1,127 @@
+<!doctype html><html>
+<head>
+<base href=https://tohjustin.github.io/posts/2022-03-04-kube-lineage-v0.5.0/>
+<meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge"><title>kube-lineage v0.5.0 - tohjustin's blog</title><link rel=icon type=image/png href=icons/favicon.png><meta name=viewport content="width=device-width,initial-scale=1">
+<meta property="og:title" content="kube-lineage v0.5.0">
+<meta property="og:description" content="Filtering by resource types">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://tohjustin.github.io/posts/2022-03-04-kube-lineage-v0.5.0/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2022-03-07T21:00:00+08:00">
+<meta property="article:modified_time" content="2022-03-07T21:00:00+08:00">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="kube-lineage v0.5.0">
+<meta name=twitter:description content="Filtering by resource types">
+<link rel=preconnect href=https://fonts.googleapis.com>
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Raleway:wght@200;600&family=Ubuntu:wght@400;700&display=swap" rel=stylesheet>
+<link rel=stylesheet type=text/css media=screen href=https://tohjustin.github.io/css/normalize.css>
+<link rel=stylesheet type=text/css media=screen href=https://tohjustin.github.io/css/main.css><link rel=stylesheet type=text/css href=https://tohjustin.github.io/css/dark.css>
+<script src=https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js></script>
+<script src=https://tohjustin.github.io/js/main.js></script>
+<script defer data-domain=tohjustin.github.io src=https://plausible.io/js/plausible.js></script>
+</head>
+<body>
+<div class="container wrapper post">
+<div class=header>
+<base href=https://tohjustin.github.io/>
+<h1 class=site-title><a href=https://tohjustin.github.io/>tohjustin's blog</a></h1>
+<div class=site-description><h2>YAML Engineer. Previously pushing packets & pixels.</h2><nav class="nav social">
+<ul class=flat><a href=https://github.com/tohjustin title=Github><i data-feather=github></i></a><a href=https://twitter.com/tohjustin_ title=Twitter><i data-feather=twitter></i></a><a href=/index.xml title=RSS><i data-feather=rss></i></a></ul>
+</nav>
+</div>
+<nav class=nav>
+<ul class=flat>
+<li>
+<a href=/>Home</a>
+</li>
+<li>
+<a href=/posts>All posts</a>
+</li>
+<li>
+<a href=/tags>Tags</a>
+</li>
+</ul>
+</nav>
+</div>
+<div class=post-header>
+<h1 class=title>kube-lineage v0.5.0</h1>
+<div class=meta>Posted at &mdash; Mar 7, 2022</div>
+</div>
+<div class=markdown>
+<h2 id=filtering-by-resource-types>Filtering by resource types</h2>
+<p>Last month, <a href=https://github.com/vrabbi>vrabbi</a> raised a <a href=https://github.com/tohjustin/kube-lineage/issues/3>feature request</a> for the ability to filter out events to make <code>kube-lineage</code>&rsquo;s output clearer to look at. Two new flags <code>--exclude-types</code> & <code>--include-types</code> were introduced so that users can specify one or more resource type(s) to exclude or include when discovering relationships, making the output easier to grok. These two flags are also supported on the <code>helm</code> subcommand.</p>
+<p>Lets take a <a href=https://github.com/kubernetes-sigs/metrics-server>metrics-server</a> deployment as an example:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl lineage deploy/metrics-server
+NAMESPACE     NAME                                                                READY   STATUS                                                                                                                              AGE
+kube-system   Deployment/metrics-server                                           1/1                                                                                                                                         5m
+kube-system   ├── Event/metrics-server.16da1cfb129975a9                           -       ScalingReplicaSet: Scaled up replica set metrics-server-ff9dbcb6c to 1                                                              5m
+kube-system   └── ReplicaSet/metrics-server-ff9dbcb6c                             1/1                                                                                                                                         5m
+kube-system       ├── Event/metrics-server-ff9dbcb6c.16da1cfb1b5eafdd             -       SuccessfulCreate: Created pod: metrics-server-ff9dbcb6c-crvm8                                                                       5m
+kube-system       └── Pod/metrics-server-ff9dbcb6c-crvm8                          1/1     Running                                                                                                                             5m
+kube-system           ├── Event/metrics-server-ff9dbcb6c-crvm8.16da1cfb1eaf3bd1   -       Scheduled: Successfully assigned kube-system/metrics-server-ff9dbcb6c-crvm8 to k3d-k3s-default-server-0                             5m
+kube-system           ├── Event/metrics-server-ff9dbcb6c-crvm8.16da1cfe710b6a54   -       Pulling: Pulling image &#34;rancher/mirrored-metrics-server:v0.5.2&#34;                                                                     5m
+kube-system           ├── Event/metrics-server-ff9dbcb6c-crvm8.16da1d034b34b8be   -       Pulled: Successfully pulled image &#34;rancher/mirrored-metrics-server:v0.5.2&#34; in 20.861236434s                                         5m
+kube-system           ├── Event/metrics-server-ff9dbcb6c-crvm8.16da1d03556367df   -       Created: Created container metrics-server                                                                                           5m
+kube-system           ├── Event/metrics-server-ff9dbcb6c-crvm8.16da1d0363753c75   -       Started: Started container metrics-server                                                                                           5m
+kube-system           ├── Event/metrics-server-ff9dbcb6c-crvm8.16da1d036921f8ff   -       Unhealthy: Readiness probe failed: Get &#34;https://10.42.0.6:4443/readyz&#34;: dial tcp 10.42.0.6:4443: connect: connection refused (x2)   5m
+kube-system           ├── Event/metrics-server-ff9dbcb6c-crvm8.16da1d03f856d6d8   -       Unhealthy: Readiness probe failed: HTTP probe failed with statuscode: 500 (x8)                                                      5m
+kube-system           └── Service/metrics-server                                  -                                                                                                                                           5m
+                          ├── APIService/v1beta1.metrics.k8s.io                   True                                                                                                                                        5m
+kube-system               └── EndpointSlice/metrics-server-hvjk2                  -
+</code></pre></div><p>Often we aren&rsquo;t too interested with <code>Event</code> resources, now we can simply omit them from the output via the <code>--exclude-types</code> flag — much cleaner!</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl lineage deploy/metrics-server --exclude-types event
+NAMESPACE     NAME                                                 READY   STATUS    AGE
+kube-system   Deployment/metrics-server                            1/1               5m
+kube-system   └── ReplicaSet/metrics-server-ff9dbcb6c              1/1               5m
+kube-system       └── Pod/metrics-server-ff9dbcb6c-crvm8           1/1     Running   5m
+kube-system           └── Service/metrics-server                   -                 5m
+                          ├── APIService/v1beta1.metrics.k8s.io    True              5m
+kube-system               └── EndpointSlice/metrics-server-hvjk2   -                 5m
+</code></pre></div><p>Sometimes we&rsquo;re only interested in a certain set of resource types:</p>
+<blockquote>
+<p>&ldquo;What <code>ClusterRole</code>, <code>ClusterRoleBinding</code>, <code>Role</code>, <code>RoleBinding</code> & <code>ServiceAccount</code> does a the <code>traefik</code> Helm release have?&rdquo;</p>
+</blockquote>
+<p>For this particular case, we can use the <code>--include-types</code> flag to specify the list of resources that we&rsquo;re only interested in.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl lineage helm traefik --depth 1 --include-types ClusterRole,ClusterRoleBinding,Role,RoleBinding,sa
+NAMESPACE     NAME                                 READY   STATUS     AGE
+kube-system   traefik                              True    Deployed   5m
+              ├── ClusterRole/traefik              -                  5m
+              ├── ClusterRoleBinding/traefik       -                  5m
+kube-system   └── ServiceAccount/traefik           -                  5m
+</code></pre></div><p>Note the <code>--exclude-types</code> & <code>--include-types</code> flags are rather flexible on the inputs, users can specify resources types in various formats. The following list of examples yields the same result:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>kubectl lineage deployment/metrics-server --exclude-types=ev
+kubectl lineage deployment/metrics-server --exclude-types=ev.events.k8s.io
+kubectl lineage deployment/metrics-server --exclude-types=event
+kubectl lineage deployment/metrics-server --exclude-types=event.events.k8s.io
+kubectl lineage deployment/metrics-server --exclude-types=events
+kubectl lineage deployment/metrics-server --exclude-types=events.events.k8s.io
+kubectl lineage deployment/metrics-server --exclude-types=Event
+kubectl lineage deployment/metrics-server --exclude-types=Event.events.k8s.io
+kubectl lineage deployment/metrics-server --exclude-types=Events
+kubectl lineage deployment/metrics-server --exclude-types=Events.events.k8s.io
+</code></pre></div><h2 id=fixes--improvements>Fixes & improvements</h2>
+<ul>
+<li>Fix <code>helm</code> subcommand crashes when client does not have permission to list Secrets</li>
+</ul>
+</div>
+<div class=post-tags>
+<nav class="nav tags">
+<ul class=flat>
+<li><a href=/tags/changelog>changelog</a></li>
+<li><a href=/tags/helm>helm</a></li>
+<li><a href=/tags/kube-lineage>kube-lineage</a></li>
+<li><a href=/tags/kubectl-plugin>kubectl-plugin</a></li>
+<li><a href=/tags/kubernetes>kubernetes</a></li>
+</ul>
+</nav>
+</div>
+</div>
+<div class="footer wrapper">
+<nav class=nav>
+<div> Built with <a href=https://gohugo.io>Hugo</a></div>
+</nav>
+</div>
+<script>feather.replace()</script>
+</body>
+</html>
