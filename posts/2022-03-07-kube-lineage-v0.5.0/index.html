@@ -1,17 +1,17 @@
 <!doctype html><html>
 <head>
-<base href=https://tohjustin.github.io/posts/2022-03-04-kube-lineage-v0.5.0/>
+<base href=https://tohjustin.github.io/posts/2022-03-07-kube-lineage-v0.5.0/>
 <meta charset=utf-8>
 <meta http-equiv=x-ua-compatible content="IE=edge"><title>kube-lineage v0.5.0 - tohjustin's blog</title><link rel=icon type=image/png href=icons/favicon.png><meta name=viewport content="width=device-width,initial-scale=1">
 <meta property="og:title" content="kube-lineage v0.5.0">
-<meta property="og:description" content="Filtering by resource types">
+<meta property="og:description" content="Filtering objects by resource types.">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://tohjustin.github.io/posts/2022-03-04-kube-lineage-v0.5.0/"><meta property="article:section" content="posts">
+<meta property="og:url" content="https://tohjustin.github.io/posts/2022-03-07-kube-lineage-v0.5.0/"><meta property="article:section" content="posts">
 <meta property="article:published_time" content="2022-03-07T21:00:00+08:00">
 <meta property="article:modified_time" content="2022-03-07T21:00:00+08:00">
 <meta name=twitter:card content="summary">
 <meta name=twitter:title content="kube-lineage v0.5.0">
-<meta name=twitter:description content="Filtering by resource types">
+<meta name=twitter:description content="Filtering objects by resource types.">
 <link rel=preconnect href=https://fonts.googleapis.com>
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Raleway:wght@200;600&family=Ubuntu:wght@400;700&display=swap" rel=stylesheet>
@@ -49,8 +49,8 @@
 <div class=meta>Posted at &mdash; Mar 7, 2022</div>
 </div>
 <div class=markdown>
-<h2 id=filtering-by-resource-types>Filtering by resource types</h2>
-<p>Last month, <a href=https://github.com/vrabbi>vrabbi</a> raised a <a href=https://github.com/tohjustin/kube-lineage/issues/3>feature request</a> for the ability to filter out events to make <code>kube-lineage</code>&rsquo;s output clearer to look at. Two new flags <code>--exclude-types</code> & <code>--include-types</code> were introduced so that users can specify one or more resource type(s) to exclude or include when discovering relationships, making the output easier to grok. These two flags are also supported on the <code>helm</code> subcommand.</p>
+<h2 id=filtering-objects-by-resource-types>Filtering objects by resource types</h2>
+<p>Last month, <a href=https://github.com/vrabbi>vrabbi</a> raised a <a href=https://github.com/tohjustin/kube-lineage/issues/3>feature request</a> for the ability to filter out events to make <code>kube-lineage</code>&rsquo;s output clearer to look at. Two new flags <code>--exclude-types</code> & <code>--include-types</code> were introduced so that users can specify one or more resource type(s) to exclude or include when discovering relationships, making the output much easier to grok. These two flags are also supported on the <code>helm</code> subcommand.</p>
 <p>Lets take a <a href=https://github.com/kubernetes-sigs/metrics-server>metrics-server</a> deployment as an example:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl lineage deploy/metrics-server
 NAMESPACE     NAME                                                                READY   STATUS                                                                                                                              AGE
@@ -69,7 +69,7 @@ kube-system           ├── Event/metrics-server-ff9dbcb6c-crvm8.16da1d03f85
 kube-system           └── Service/metrics-server                                  -                                                                                                                                           5m
                           ├── APIService/v1beta1.metrics.k8s.io                   True                                                                                                                                        5m
 kube-system               └── EndpointSlice/metrics-server-hvjk2                  -
-</code></pre></div><p>Often we aren&rsquo;t too interested with <code>Event</code> resources, now we can simply omit them from the output via the <code>--exclude-types</code> flag — much cleaner!</p>
+</code></pre></div><p>Often we aren&rsquo;t too interested with <code>Event</code> resources, now we can simply omit them from the output via the <code>--exclude-types</code> flag — looks much cleaner!</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl lineage deploy/metrics-server --exclude-types event
 NAMESPACE     NAME                                                 READY   STATUS    AGE
 kube-system   Deployment/metrics-server                            1/1               5m
