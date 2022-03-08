@@ -50,7 +50,7 @@
 </div>
 <div class=markdown>
 <h2 id=filtering-objects-by-resource-types>Filtering objects by resource types</h2>
-<p>Last month, <a href=https://github.com/vrabbi>vrabbi</a> raised a <a href=https://github.com/tohjustin/kube-lineage/issues/3>feature request</a> for the ability to filter out events to make <code>kube-lineage</code>&rsquo;s output clearer to look at. Two new flags <code>--exclude-types</code> & <code>--include-types</code> were introduced so that users can specify one or more resource type(s) to exclude or include when discovering relationships, making the output much easier to grok. These two flags are also supported on the <code>helm</code> subcommand.</p>
+<p>Last month, <a href=https://github.com/vrabbi>vrabbi</a> raised a <a href=https://github.com/tohjustin/kube-lineage/issues/3>feature request</a> for the ability to filter out events to make <code>kube-lineage</code>&rsquo;s output clearer to look at. To handle this in a more generic manner, two new flags <code>--exclude-types</code> & <code>--include-types</code> were introduced so that users can specify one or more resource type(s) to exclude/include when discovering relationships, making the output much easier to grok. These flags are also supported by the <code>helm</code> subcommand.</p>
 <p>Lets take a <a href=https://github.com/kubernetes-sigs/metrics-server>metrics-server</a> deployment as an example:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl lineage deploy/metrics-server
 NAMESPACE     NAME                                                                READY   STATUS                                                                                                                              AGE
@@ -69,7 +69,7 @@ kube-system           ├── Event/metrics-server-ff9dbcb6c-crvm8.16da1d03f85
 kube-system           └── Service/metrics-server                                  -                                                                                                                                           5m
                           ├── APIService/v1beta1.metrics.k8s.io                   True                                                                                                                                        5m
 kube-system               └── EndpointSlice/metrics-server-hvjk2                  -
-</code></pre></div><p>Often we aren&rsquo;t too interested with <code>Event</code> resources, now we can simply omit them from the output via the <code>--exclude-types</code> flag — looks much cleaner!</p>
+</code></pre></div><p>Often we aren&rsquo;t too interested with <code>Event</code> resources, now we can simply omit them from the output via the <code>--exclude-types</code> flag:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl lineage deploy/metrics-server --exclude-types event
 NAMESPACE     NAME                                                 READY   STATUS    AGE
 kube-system   Deployment/metrics-server                            1/1               5m
@@ -80,16 +80,20 @@ kube-system           └── Service/metrics-server                   -      
 kube-system               └── EndpointSlice/metrics-server-hvjk2   -                 5m
 </code></pre></div><p>Sometimes we&rsquo;re only interested in a certain set of resource types:</p>
 <blockquote>
-<p>&ldquo;What <code>ClusterRole</code>, <code>ClusterRoleBinding</code>, <code>Role</code>, <code>RoleBinding</code> & <code>ServiceAccount</code> does a the <code>traefik</code> Helm release have?&rdquo;</p>
+<p>&ldquo;What <code>ClusterRole</code>, <code>ClusterRoleBinding</code>, <code>Role</code>, <code>RoleBinding</code> & <code>ServiceAccount</code> does our <code>traefik</code> Helm release have?&rdquo;</p>
 </blockquote>
-<p>For this particular case, we can use the <code>--include-types</code> flag to specify the list of resources that we&rsquo;re only interested in.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl lineage helm traefik --depth 1 --include-types ClusterRole,ClusterRoleBinding,Role,RoleBinding,sa
+<p>For this particular case, we can use the <code>--include-types</code> flag to specify the list of resources types that we&rsquo;re only interested in:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>$ kubectl lineage helm traefik \
+    --depth 1 \
+    --include-types ClusterRole,ClusterRoleBinding \
+    --include-types Role,RoleBinding \
+    --include-types sa
 NAMESPACE     NAME                                 READY   STATUS     AGE
 kube-system   traefik                              True    Deployed   5m
               ├── ClusterRole/traefik              -                  5m
               ├── ClusterRoleBinding/traefik       -                  5m
 kube-system   └── ServiceAccount/traefik           -                  5m
-</code></pre></div><p>Note the <code>--exclude-types</code> & <code>--include-types</code> flags are rather flexible on the inputs, users can specify resources types in various formats. The following list of examples yields the same result:</p>
+</code></pre></div><p>Note that the <code>--exclude-types</code> & <code>--include-types</code> flags are rather flexible on the inputs, users can specify resources types in various formats. The following list of examples yields the same result:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text>kubectl lineage deployment/metrics-server --exclude-types=ev
 kubectl lineage deployment/metrics-server --exclude-types=ev.events.k8s.io
 kubectl lineage deployment/metrics-server --exclude-types=event
